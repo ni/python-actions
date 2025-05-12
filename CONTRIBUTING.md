@@ -1,11 +1,11 @@
-# Contributing to \<reponame\> 
+# Contributing to `ni/python-actions` 
 
-Contributions to \<reponame\> are welcome from all!
+Contributions to `ni/python-actions` are welcome from all!
 
-\<reponame\> is managed via [git](https://git-scm.com), with the canonical upstream
+`ni/python-actions` is managed via [git](https://git-scm.com), with the canonical upstream
 repository hosted on [GitHub](https://github.com/ni/<reponame>/).
 
-\<reponame\> follows a pull-request model for development.  If you wish to
+`ni/python-actions` follows a pull-request model for development.  If you wish to
 contribute, you will need to create a GitHub account, fork this project, push a
 branch with your changes to your project, and then submit a pull request.
 
@@ -58,4 +58,4 @@ See [GitHub's official documentation](https://help.github.com/articles/using-pul
 (taken from [developercertificate.org](https://developercertificate.org/))
 
 See [LICENSE](https://github.com/ni/<reponame>/blob/main/LICENSE)
-for details about how \<reponame\> is licensed.
+for details about how `ni/python-actions` is licensed.
