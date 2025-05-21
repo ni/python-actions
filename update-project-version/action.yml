@@ -50,6 +50,8 @@ runs:
     # numeric job id at the end, which is only available via the REST API.
     id: get-log-url
     uses: Tiryoh/gha-jobid-action@be260d8673c9211a84cdcf37794ebd654ba81eef # v1.4.0
+    with:
+      job_name: ${{ github.job }}
   - name: Create pull request
     if: inputs.create-pull-request == 'true'
     uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
