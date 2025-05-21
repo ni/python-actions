@@ -38,10 +38,10 @@ runs:
     working-directory: ${{ inputs.project-directory }}
   - name: Get changed files
     id: get-changed-files
-    run: echo "changed-files=$(git diff --name-only | tr -d '\n')" >> "$GITHUB_OUTPUT"
+    run: echo "changed-files="$(git diff --name-only | awk '{ print "-", $0 }')" >> "$GITHUB_OUTPUT"
     shell: bash 
   - name: Create pull request
-    if: inputs.create-pull-request == 'true' && steps.get-changed-files.outputs.changed-files != ''
+    if: inputs.create-pull-request == 'true'
     uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
     with:
       branch: ${{ steps.set-vars.outputs.branch-name }}
