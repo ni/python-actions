@@ -15,7 +15,7 @@ By default, this action installs Python 3.11.9.
 
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.1.0
+- uses: ni/python-actions/setup-python@v0.2
 ```
 
 ### Inputs
@@ -28,7 +28,7 @@ strategy:
   matrix:
     python-version: [3.9, '3.10', 3.11, 3.12, 3.13]
 steps:
-- uses: ni/python-actions/setup-python@v0.1.0
+- uses: ni/python-actions/setup-python@v0.2
   with:
     python-version: ${{ matrix.python-version }}
 ```
@@ -40,7 +40,7 @@ steps:
 You can use the `python-version` output to get the actual version of Python, which is useful for caching:
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.1.0
+- uses: ni/python-actions/setup-python@v0.2
   id: setup-python
 - uses: actions/cache@v4
   with:
@@ -56,7 +56,7 @@ containing the Python installation.
 You can also use the `python-path` output to get the path to the Python interpreter:
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.1.0
+- uses: ni/python-actions/setup-python@v0.2
   id: setup-python
 - run: pipx install <package> --python ${{ steps.setup-python.outputs.python-version }}
 ```
@@ -75,8 +75,8 @@ By default, this action installs Poetry 1.8.2.
 
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.1.0
-- uses: ni/python-actions/setup-poetry@v0.1.0
+- uses: ni/python-actions/setup-python@v0.2
+- uses: ni/python-actions/setup-poetry@v0.2
 - run: poetry install -v
 ```
 
@@ -86,8 +86,8 @@ steps:
 
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.1.0
-- uses: ni/python-actions/setup-poetry@v0.1.0
+- uses: ni/python-actions/setup-python@v0.2
+- uses: ni/python-actions/setup-poetry@v0.2
   with:
     poetry-version: 2.1.3
 - run: poetry install -v
@@ -113,9 +113,9 @@ permissions:
 
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.1.0
-- uses: ni/python-actions/setup-poetry@v0.1.0
-- uses: ni/python-actions/update-project-version@v0.1.0
+- uses: ni/python-actions/setup-python@v0.2
+- uses: ni/python-actions/setup-poetry@v0.2
+- uses: ni/python-actions/update-project-version@v0.2
 ```
 
 ### Inputs
@@ -125,7 +125,7 @@ steps:
 You can specify `project-directory` to update a project located in a subdirectory.
 
 ```yaml
-- uses: ni/python-actions/update-project-version@v0.1.0
+- uses: ni/python-actions/update-project-version@v0.2
   with:
     project-directory: packages/foo
 ```
@@ -137,7 +137,7 @@ You can specify `branch-prefix` to customize the pull request branch names. The 
 `users/build/update-project-version-releases-1.1`.
 
 ```yaml
-- uses: ni/python-actions/update-project-version@v0.1.0
+- uses: ni/python-actions/update-project-version@v0.2
   with:
     branch-prefix: users/python-build/
 ```
@@ -148,15 +148,15 @@ You can use `create-pull-request` and `project-directory` to update multiple pro
 pull request.
 
 ```yaml
-- uses: ni/python-actions/update-project-version@v0.1.0
+- uses: ni/python-actions/update-project-version@v0.2
   with:
     project-directory: packages/foo
     create-pull-request: false
-- uses: ni/python-actions/update-project-version@v0.1.0
+- uses: ni/python-actions/update-project-version@v0.2
   with:
     project-directory: packages/bar
     create-pull-request: false
-- uses: ni/python-actions/update-project-version@v0.1.0
+- uses: ni/python-actions/update-project-version@v0.2
   with:
     project-directory: packages/baz
     create-pull-request: true
