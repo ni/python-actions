@@ -40,17 +40,19 @@ def main(args: list[str]) -> None:
     parser.add_argument("--dev", action="store_true")
     args = parser.parse_args()
 
-    version = subprocess.check_output(["poetry", "version", "--short"])
+    version = subprocess.check_output(["poetry", "version", "--short"], text=True).strip()
 
     if args.dev:
         if "dev" in version:
-            new_version = _bump_dev_version()
+            new_version = _bump_dev_version(version)
             subprocess.run(["poetry", "version", new_version])
         else:
             # Run `poetry version` to update the version using the specified bump rule (e.g. "1.0.0"
             # -> "2.0.0", "1.1.0", or "1.0.1"), then add ".dev0" to the end.
             subprocess.run(["poetry", "version", args.rule])
-            new_version = subprocess.check_output(["poetry", "version", "--short"])
+            new_version = subprocess.check_output(
+                ["poetry", "version", "--short"], text=True
+            ).strip()
             new_version += ".dev0"
             subprocess.run(["poetry", "version", new_version])
     else:
@@ -58,4 +60,4 @@ def main(args: list[str]) -> None:
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.args[1:]))
+    sys.exit(main(sys.argv[1:]))
