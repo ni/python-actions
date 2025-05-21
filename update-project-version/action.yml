@@ -38,7 +38,7 @@ runs:
     working-directory: ${{ inputs.project-directory }}
   - name: Get changed files
     id: get-changed-files
-    run: echo "changed-files=$(git diff --name-only)" >> "$GITHUB_OUTPUT"
+    run: echo "changed-files=$(git diff --name-only | tr -d '\n')" >> "$GITHUB_OUTPUT"
     shell: bash 
   - name: Create pull request
     if: inputs.create-pull-request == 'true' && steps.get-changed-files.outputs.changed-files != ''
