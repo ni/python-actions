@@ -38,7 +38,11 @@ runs:
     working-directory: ${{ inputs.project-directory }}
   - name: Get changed files
     id: get-changed-files
-    run: echo "changed-files="$(git diff --name-only | awk '{ print \"-\", $0 }')" >> "$GITHUB_OUTPUT"
+    run: |
+      echo "changed-files<<EOF" >> "$GITHUB_OUTPUT"
+      # Prefix with "- " to generate a Markdown list.
+      git diff --name-only | awk '{ print "-", $0 }' >> "$GITHUB_OUTPUT"
+      echo "EOF" >> "$GITHUB_OUTPUT"
     shell: bash 
   - name: Create pull request
     if: inputs.create-pull-request == 'true'
