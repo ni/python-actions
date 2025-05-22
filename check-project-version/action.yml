@@ -40,7 +40,7 @@ runs:
 
       # Convert newline to %0A so that GitHub includes the entire error message
       # in the annotation.
-      error_message = "$(echo "$error_message" | sed -z 's/\n/%0A/g;s/%0A$/\n/')"
+      error_message="$(echo "$error_message" | sed -z 's/\n/%0A/g;s/%0A$/\n/')"
       echo "::notice title=Notice::D"
 
       if [ x"$project_version" != x"$expected_version" ]; then
