@@ -13,16 +13,12 @@ inputs:
 runs:
   using: composite
   steps:
-  - run: echo "::notice title=Notice::Test"
-    shell: bash
   - name: Check project version
     run: |
-      echo "::notice title=Notice::A"
       project_version="$(poetry version --short)"
       expected_version="${{ inputs.expected-version }}"
       # Strip the leading 'v', in case this is a GitHub release tag.
       expected_version="${expected_version#v}"
-      echo "::notice title=Notice::B"
 
       error_message="$(cat <<EOF
       The project version in pyproject.toml does not match the expected version.
@@ -36,15 +32,13 @@ runs:
       Expected version: $expected_version
       EOF
       )"
-      echo "::notice title=Notice::C"
 
       # Convert newline to %0A so that GitHub includes the entire error message
       # in the annotation.
       error_message="$(echo "$error_message" | sed -z 's/\n/%0A/g;s/%0A$/\n/')"
-      echo "::notice title=Notice::D"
 
       if [ x"$project_version" != x"$expected_version" ]; then
         echo "::error title=Project Version Error::$error_message"
+        exit 1
       fi
-      echo "::notice title=Notice::E"
     shell: bash
