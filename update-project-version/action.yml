@@ -27,7 +27,13 @@ runs:
   - name: Set variables
     id: set-vars
     run: |
-      base_branch=$(git symbolic-ref --short HEAD)
+      # For release events, github.ref_name is the release tag (e.g. 1.0.0) and
+      # github.event.release.target_commitish is the branch/tag/commit that the
+      # tag was created from (e.g. main).
+      #
+      # For workflow_dispatch events, github.ref_name is the branch/tag/commit
+      # that the workflow was dispatched on.
+      base_branch="${{ github.event_name == 'release' && github.event.release.target_commitish || github.ref_name }}"
       base_branch_no_slashes=$(echo $base_branch | tr '/' '-')
       echo "base-branch=$base_branch" >> "$GITHUB_OUTPUT"
       echo "branch-name=${{ inputs.branch-prefix }}update-project-version-$base_branch_no_slashes" >> "$GITHUB_OUTPUT"
