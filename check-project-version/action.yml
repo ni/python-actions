@@ -15,12 +15,12 @@ runs:
   steps:
   - name: Check project version
     run: |
+      project_version="$(poetry version --short)"
       expected_version="${{ inputs.expected-version }}"
       # Strip the leading 'v', in case this is a GitHub release tag.
       expected_version="${expected_version#v}"
-      project_version="$(poetry version --short)"
-      if [ x"$project_version" != x"$expected_version" ]; then
-        echo <<EOF
+
+      read -r -d '' error_message <<EOF
       The project version in pyproject.toml does not match the expected version.
       
       If this workflow was triggered by a GitHub release, verify that the
@@ -31,6 +31,9 @@ runs:
       Project version: $project_version
       Expected version: $expected_version
       EOF
+
+      if [ x"$project_version" != x"$expected_version" ]; then
+        echo "::error title=Project Version Error::${error_message//'\n'/'%0A'}"
         exit 1
       fi
     shell: bash
