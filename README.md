@@ -2,6 +2,34 @@
 
 `ni/python-actions` is a Git repository containing reusable GitHub Actions for NI Python projects.
 
+## Table of Contents
+
+- [`ni/python-actions`](#nipython-actions)
+  - [Table of Contents](#table-of-contents)
+  - [`ni/python-actions/setup-python`](#nipython-actionssetup-python)
+    - [Usage](#usage)
+    - [Inputs](#inputs)
+      - [`python-version`](#python-version)
+    - [Outputs](#outputs)
+      - [`python-version`](#python-version-1)
+      - [`python-path`](#python-path)
+  - [`ni/python-actions/setup-poetry`](#nipython-actionssetup-poetry)
+    - [Usage](#usage-1)
+    - [Inputs](#inputs-1)
+      - [`poetry-version`](#poetry-version)
+  - [`ni/python-actions/check-project-version`](#nipython-actionscheck-project-version)
+    - [Usage](#usage-2)
+    - [Inputs](#inputs-2)
+      - [`project-directory`](#project-directory)
+      - [`expected-version`](#expected-version)
+  - [`ni/python-actions/update-project-version`](#nipython-actionsupdate-project-version)
+    - [Usage](#usage-3)
+    - [Inputs](#inputs-3)
+      - [`project-directory`](#project-directory-1)
+      - [`branch-prefix`](#branch-prefix)
+      - [`create-pull-request`](#create-pull-request)
+      - [`version-rule` and `use-dev-suffix`](#version-rule-and-use-dev-suffix)
+
 ## `ni/python-actions/setup-python`
 
 The `setup-python` action installs Python and adds it to the PATH.
@@ -23,6 +51,7 @@ steps:
 #### `python-version`
 
 You can specify the `python-version` input for testing with multiple versions of Python:
+
 ```yaml
 strategy:
   matrix:
@@ -38,6 +67,7 @@ steps:
 #### `python-version`
 
 You can use the `python-version` output to get the actual version of Python, which is useful for caching:
+
 ```yaml
 steps:
 - uses: ni/python-actions/setup-python@v0.2
@@ -54,6 +84,7 @@ steps:
 containing the Python installation.
 
 You can also use the `python-path` output to get the path to the Python interpreter:
+
 ```yaml
 steps:
 - uses: ni/python-actions/setup-python@v0.2
@@ -91,6 +122,46 @@ steps:
   with:
     poetry-version: 2.1.3
 - run: poetry install -v
+```
+
+## `ni/python-actions/check-project-version`
+
+The `check-project-version` action uses Poetry to get the version of a Python project and checks
+that it matches an expected version. By default, this action checks against `github.ref_name`, which
+is the GitHub release tag for GitHub release events.
+
+This action requires Poetry, so you must call `setup-python` and `setup-poetry` first.
+
+### Usage
+
+```yaml
+steps:
+- uses: ni/python-actions/setup-python@v0.2
+- uses: ni/python-actions/setup-poetry@v0.2
+- uses: ni/python-actions/check-project-version@v0.2
+  if: github.event_name == 'release'
+```
+
+### Inputs
+
+#### `project-directory`
+
+You can specify `project-directory` to check a project located in a subdirectory.
+
+```yaml
+- uses: ni/python-actions/check-project-version@v0.2
+  with:
+    project-directory: packages/foo
+```
+
+#### `expected-version`
+
+You can specify `expected-version` to check against something other than `github.ref_name`.
+
+```yaml
+- uses: ni/python-actions/check-project-version@v0.2
+  with:
+    expected-version: ${{ steps.get-expected-version.outputs.version }}
 ```
 
 ## `ni/python-actions/update-project-version`
