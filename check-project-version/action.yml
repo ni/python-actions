@@ -21,17 +21,16 @@ runs:
       project_version="$(poetry version --short)"
       if [ x"$project_version" != x"$expected_version" ]; then
         echo <<EOF
-        The project version in pyproject.toml does not match the expected
-        version.
-        
-        If this workflow was triggered by a GitHub release, verify that the
-        release was tagged with the correct version. If they don't match, you
-        should either update pyproject.toml or delete and re-create the release
-        with the correct tag.
+      The project version in pyproject.toml does not match the expected version.
+      
+      If this workflow was triggered by a GitHub release, verify that the
+      release was tagged with the correct version. If they don't match, you
+      should either update pyproject.toml or delete and re-create the release
+      with the correct tag.
 
-        Project version: $project_version
-        Expected version: $expected_version
-        EOF
+      Project version: $project_version
+      Expected version: $expected_version
+      EOF
         exit 1
       fi
     shell: bash
