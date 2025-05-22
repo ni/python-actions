@@ -32,7 +32,11 @@ runs:
       Expected version: $expected_version
       EOF
 
+      # Convert newline to %0A so that GitHub includes the entire error message
+      # in the annotation.
+      error_message = "$(echo "$error_message" | sed -z 's/\n/%0A/g;s/%0A$/\n/')"
+
       if [ x"$project_version" != x"$expected_version" ]; then
-        echo "::error title=Project Version Error::${error_message//'\n'/'%0A'}"
+        echo "::error title=Project Version Error::$error_message"
       fi
     shell: bash
