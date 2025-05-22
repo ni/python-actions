@@ -24,7 +24,7 @@ runs:
       expected_version="${expected_version#v}"
       echo "::notice title=Notice::B"
 
-      read -r -d '' error_message <<EOF
+      error_message="$(cat <<EOF
       The project version in pyproject.toml does not match the expected version.
       
       If this workflow was triggered by a GitHub release, verify that the
@@ -35,6 +35,7 @@ runs:
       Project version: $project_version
       Expected version: $expected_version
       EOF
+      )"
       echo "::notice title=Notice::C"
 
       # Convert newline to %0A so that GitHub includes the entire error message
