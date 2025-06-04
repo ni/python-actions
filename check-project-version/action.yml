@@ -42,3 +42,4 @@ runs:
         exit 1
       fi
     shell: bash
+    working-directory: ${{ inputs.project-directory }}
