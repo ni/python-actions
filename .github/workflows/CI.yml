@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test_actions:
+    name: Test actions
+    uses: ./.github/workflows/test_actions.yml

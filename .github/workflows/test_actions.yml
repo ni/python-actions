@@ -1,0 +1,86 @@
+name: Test actions
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test_check_project_version:
+    name: Test check-project-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up Python
+        uses: ./setup-python
+      - name: Set up Poetry
+        uses: ./setup-poetry
+      - name: Create project with version 1.0.0
+        run: |
+          poetry new test-project
+          poetry version 1.0.0 -C test-project
+      - name: Check version == 1.0.0
+        uses: ./check-project-version
+        with:
+          project-directory: test-project
+          expected-version: 1.0.0
+      - name: Create a notice about the expected failure
+        run: echo "::notice title=Notice::The next step is expected to fail."
+      - name: Check version == 1.0.1 (expected to fail)
+        id: expected-failure
+        continue-on-error: true
+        uses: ./check-project-version
+        with:
+          project-directory: test-project
+          expected-version: 1.0.1
+      - name: Error if the previous step didn't fail
+        if: steps.expected-failure.conclusion != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1
+  test_update_project_version:
+    name: Test update-project-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up Python
+        uses: ./setup-python
+      - name: Set up Poetry
+        uses: ./setup-poetry
+      - name: Create project with version 1.0.0
+        run: |
+          poetry new test-project
+          poetry version 1.0.0 -C test-project
+      - name: Update version to 1.0.1
+        uses: ./update-project-version
+        with:
+          project-directory: test-project
+          create-pull-request: false
+          version-rule: patch
+          use-dev-suffix: false
+      - name: Check version == 1.0.1
+        uses: ./check-project-version
+        with:
+          project-directory: test-project
+          expected-version: 1.0.1
+      - name: Update version to 1.0.2.dev0
+        uses: ./update-project-version
+        with:
+          project-directory: test-project
+          create-pull-request: false
+      - name: Check version == 1.0.2.dev0
+        uses: ./check-project-version
+        with:
+          project-directory: test-project
+          expected-version: 1.0.2.dev0
+      - name: Update version to 1.0.2.dev1
+        uses: ./update-project-version
+        with:
+          project-directory: test-project
+          create-pull-request: false
+      - name: Check version == 1.0.2.dev1
+        uses: ./check-project-version
+        with:
+          project-directory: test-project
+          expected-version: 1.0.2.dev1
