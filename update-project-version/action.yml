@@ -56,6 +56,7 @@ runs:
     with:
       base: ${{ steps.set-vars.outputs.base-branch }}
       branch: ${{ steps.set-vars.outputs.branch-name }}
+      commit-message: "chore: Update project version - ${{ steps.set-vars.outputs.base-branch }}"
       title: "chore: Update project version - ${{ steps.set-vars.outputs.base-branch }}"
       # The workflow log currently points to the run, not the specific job
       # within that run. Linking to a specific job requires the numeric job id,
