@@ -34,7 +34,7 @@ jobs:
           project-directory: test-project
           expected-version: 1.0.1
       - name: Error if the previous step didn't fail
-        if: steps.expected-failure.conclusion != 'failure'
+        if: steps.expected-failure.outcome != 'failure'
         run: |
           echo "::error title=Test Failure::The previous step did not fail as expected."
           exit 1
