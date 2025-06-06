@@ -23,7 +23,7 @@ jobs:
         run: |
           import sys
           version = sys.version_info[:2]
-          expected_version = tuple("${{ matrix.python-version }}".split("."))
+          expected_version = tuple(map(int, "${{ matrix.python-version }}".split(".")))
           if version != expected_version:
               print(f"::error title=Test Failure::The Python version does not match. Got {version}, expected {expected_version}.")
               sys.exit(1)
