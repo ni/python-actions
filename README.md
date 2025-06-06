@@ -17,6 +17,9 @@
     - [Usage](#usage-1)
     - [Inputs](#inputs-1)
       - [`poetry-version`](#poetry-version)
+      - [`use-cache`](#use-cache)
+    - [Outputs](#outputs-1)
+      - [`cache-hit`](#cache-hit)
   - [`ni/python-actions/check-project-version`](#nipython-actionscheck-project-version)
     - [Usage](#usage-2)
     - [Inputs](#inputs-2)
@@ -124,6 +127,17 @@ steps:
     poetry-version: 2.1.3
 - run: poetry install -v
 ```
+
+#### `use-cache`
+
+If you run into caching problems, you can disable caching by specifying `use-cache: false`.
+
+### Outputs
+
+#### `cache-hit`
+
+You can use `cache-hit` to check whether Poetry was loaded from cache. This is mainly intended for
+testing the action.
 
 ## `ni/python-actions/check-project-version`
 
