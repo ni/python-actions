@@ -3,6 +3,17 @@ description: Install Poetry, add it to the PATH, and cache it to speed up workfl
 inputs:
   poetry-version:
     default: 1.8.2
+  use-cache:
+    description: >
+      A Boolean specifying whether to use the cache. Set this to false to work
+      around caching problems.
+    default: true
+outputs:
+  cache-hit:
+    description: >
+      A Boolean indicating whether Poetry was loaded from the cache. This is
+      mainly intended for testing the action.
+    value: ${{ steps.cache-poetry.outputs.cache-hit }}
 runs:
   using: composite
   steps:
@@ -38,6 +49,7 @@ runs:
         echo "poetry-home=$POETRY_HOME" >> "$GITHUB_OUTPUT"
       shell: bash
     - name: Cache poetry
+      if: ${{ inputs.use-cache == 'true' }}
       id: cache-poetry
       uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       with:
