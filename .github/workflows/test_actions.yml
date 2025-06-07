@@ -73,7 +73,7 @@ jobs:
       - name: Set up Poetry
         id: setup-poetry
         uses: ./setup-poetry
-      - name: Expect cache hit 
+      - name: Error if cache miss
         if: steps.setup-poetry.outputs.cache-hit != 'true'
         run: echo "::error title=Test Failure::Expected cache hit."; exit 1
         shell: bash
@@ -107,7 +107,7 @@ jobs:
         uses: ./setup-poetry
         with:
           use-cache: false
-      - name: Expect cache miss 
+      - name: Error if cache hit
         if: steps.setup-poetry.outputs.cache-hit == 'true'
         run: echo "::error title=Test Failure::Expected cache miss."; exit 1
         shell: bash
