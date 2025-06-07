@@ -12,6 +12,12 @@ inputs:
       Specifies whether to create a pull request. Set this to false to update
       the project version without creating a pull request.
     default: true
+  token:
+    description: >
+      GitHub token to use to create the pull request. The default GITHUB_TOKEN
+      cannot trigger PR workflows, so you can use this to specify a PAT that is
+      saved in a repo/org secret.
+    default: ${{ github.token }}
   version-rule:
     description: >
       Specifies the rule for how to update the version number, such as "major",
@@ -58,6 +64,7 @@ runs:
       branch: ${{ steps.set-vars.outputs.branch-name }}
       commit-message: "chore: Update project version - ${{ steps.set-vars.outputs.base-branch }}"
       title: "chore: Update project version - ${{ steps.set-vars.outputs.base-branch }}"
+      token: ${{ inputs.token }}
       # The workflow log currently points to the run, not the specific job
       # within that run. Linking to a specific job requires the numeric job id,
       # which is not available in the github context.
