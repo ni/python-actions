@@ -256,8 +256,9 @@ desired release version before creating a release in GitHub.
 
 #### `token`
 
-The default GITHUB_TOKEN cannot trigger PR workflows. You can work around this by using `token` to
-specify a token that is saved in a repo/org secret.
+The default GITHUB_TOKEN cannot trigger PR workflows, so the generated pull request will not run any
+status checks. You can work around this by using `token` to specify a token that is saved in a
+repo/org secret.
 
 See [Triggering further workflow
 runs](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs)
