@@ -23,9 +23,14 @@ jobs:
         run: |
           import sys
           version = sys.version_info[:2]
-          expected_version = tuple(map(int, "${{ matrix.python-version }}".split(".")))
+          expected_version = tuple(map(int, "${{ matrix.python-version }}".removeprefix("pypy").split(".")))
           if version != expected_version:
               print(f"::error title=Test Failure::The Python version does not match. Got {version}, expected {expected_version}.")
+              sys.exit(1)
+          implementation = sys.implementation.name
+          expected_implementation = "pypy" if "${{ matrix.python-version }}".startswith("pypy") else "cpython"
+          if implementation != expected_implementation:
+              print(f"::error title=Test Failure::The Python implementation does not match. Got {implementation}, expected {expected_implementation}.")
               sys.exit(1)
         shell: python
 
