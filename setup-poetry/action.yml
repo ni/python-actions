@@ -59,8 +59,7 @@ runs:
     - name: Install Poetry
       if: steps.cache-poetry.outputs.cache-hit != 'true'
       run: |
-        ls -al "$pythonLocation"
-        "$pythonLocation/python" -m venv "$POETRY_HOME"
+        python -m venv "$POETRY_HOME"
         "$POETRY_HOME_BIN/python" -m pip install poetry==${{ inputs.poetry-version }}
         mkdir -p "$POETRY_BIN_DIR"
         ln -s "$POETRY_HOME_BIN/poetry"* "$POETRY_BIN_DIR/"
