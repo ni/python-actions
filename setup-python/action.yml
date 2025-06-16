@@ -7,7 +7,7 @@ outputs:
   python-path:
     value: ${{ steps.setup-python.outputs.python-path }}
   python-version:
-    value: ${{ steps.setup-python.outputs.python-version }}
+    value: ${{ steps.get-python-version.outputs.python-version }}
 runs:
   using: composite
   steps:
@@ -16,3 +16,22 @@ runs:
       id: setup-python
       with:
         python-version: ${{ inputs.python-version }}
+    # Workaround for https://github.com/actions/setup-python/issues/1109 -
+    # Python-version output for PyPy isn't unique across different versions 
+    - name: Get Python version
+      id: get-python-version
+      run: |
+        import os, platform, sys, sysconfig
+        if sys.implementation.name == "pypy":
+            version = f"pypy{platform.python_version()}-v{'.'.join(map(str,sys.implementation.version[:3]))}"
+        else:
+            version = platform.python_version()
+        # Also take free-threading into account
+        if sysconfig.get_config_var("Py_GIL_DISABLED"):
+            version += "t"
+        with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+            print(f"python-version={version}", file=output)
+      shell: python
+    - name: Add pythonVersion environment variable
+      run: echo "pythonVersion=${{ steps.get-python-version.outputs.python-version }}" >> "$GITHUB_ENV"
+      shell: bash
