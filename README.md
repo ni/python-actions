@@ -13,6 +13,8 @@
     - [Outputs](#outputs)
       - [`python-version`](#python-version-1)
       - [`python-path`](#python-path)
+    - [Environment Variables](#environment-variables)
+      - [`pythonVersion`](#pythonversion)
   - [`ni/python-actions/setup-poetry`](#nipython-actionssetup-poetry)
     - [Usage](#usage-1)
     - [Inputs](#inputs-1)
@@ -82,6 +84,12 @@ steps:
     key: venv-${{ runner.os }}-py${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('poetry.lock') }}
 ```
 
+`python-version` is unique across implementations (CPython vs. PyPy) and free-threaded builds:
+
+- CPython: "3.13.4".
+- CPython with free-threading: "3.13.4t"
+- PyPy: "pypy3.11.11-v7.3.19"
+
 #### `python-path`
 
 `actions/setup-python` sets the `pythonLocation` environment variable to the **directory**
@@ -95,6 +103,13 @@ steps:
   id: setup-python
 - run: pipx install <package> --python ${{ steps.setup-python.outputs.python-version }}
 ```
+
+### Environment Variables
+
+#### `pythonVersion`
+
+This is the same as `outputs.python-version` and is mainly intended for use in
+`ni/python-actions/setup-poetry`.
 
 ## `ni/python-actions/setup-poetry`
 
