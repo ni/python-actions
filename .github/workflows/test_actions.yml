@@ -212,22 +212,6 @@ jobs:
           project-directory: test-project
           expected-version: 1.0.2.dev1
 
-  test_python_location:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-        python-version: [3.11, pypy3.11]
-    steps:
-      - uses: actions/setup-python@v5.6.0
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: ls -al "$pythonLocation"
-        shell: bash
-      - run: |
-          "$pythonLocation/python" -V
-        shell: bash
-
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a
   # lot of corner cases that make this harder than it should be; see See
