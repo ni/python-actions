@@ -222,7 +222,10 @@ jobs:
       - uses: actions/setup-python@v5.6.0
         with:
           python-version: ${{ matrix.python-version }}
-      - run: ls -al $pythonLocation
+      - run: ls -al "$pythonLocation"
+        shell: bash
+      - run: |
+          "$pythonLocation/python" -V
         shell: bash
 
   # This job is intended to combine the test results so we don't have to list
