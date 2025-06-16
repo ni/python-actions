@@ -17,14 +17,12 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Get Python version
-      id: get-python-version
+    - name: Check that setup-python was called
       run: |
-        if [ ! -d "$pythonLocation" ]; then
+        if [ ! -d "$pythonLocation" -o -z "$pythonVersion" ]; then
           echo "You must use the setup-python action before using this action."
           exit 1
         fi 
-        "$pythonLocation/python" -c "import platform; print(f'python-version={platform.python_version()}')" >> "$GITHUB_OUTPUT"
       shell: bash
     - name: Set paths (Linux/Mac)
       if: runner.os != 'Windows'
@@ -57,7 +55,7 @@ runs:
         path: |
           ${{ steps.copy-paths.outputs.poetry-bin-dir }}/poetry*
           ${{ steps.copy-paths.outputs.poetry-home }}          
-        key: poetry${{ inputs.poetry-version }}-${{ runner.os }}-py${{ steps.get-python-version.outputs.python-version }}
+        key: poetry${{ inputs.poetry-version }}-${{ runner.os }}-py${{ env.pythonVersion }}
     - name: Install Poetry
       if: steps.cache-poetry.outputs.cache-hit != 'true'
       run: |
