@@ -70,7 +70,7 @@ runs:
       run: poetry --version
       shell: bash
     - name: Log debug info
-      if: failure()
+      # if: failure()
       run: |
         echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
         echo "PATH=$PATH"
