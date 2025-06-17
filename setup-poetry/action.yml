@@ -42,6 +42,13 @@ runs:
         Add-Content $env:GITHUB_ENV "POETRY_HOME_BIN=$HOME\.local\poetry\home\Scripts"
         Add-Content $env:GITHUB_PATH "$HOME\.local\poetry\bin"
       shell: pwsh
+    - name: Log paths
+      run: |
+        echo "POETRY_BIN_DIR=$POETRY_BIN_DIR"
+        echo "POETRY_HOME=$POETRY_HOME"
+        echo "POETRY_HOME_BIN=$POETRY_HOME_BIN"
+        echo "PATH=$PATH"
+      shell: bash
     - name: Copy paths from $GITHUB_ENV to $GITHUB_OUTPUT
       id: copy-paths
       run: |
@@ -68,4 +75,8 @@ runs:
       shell: bash
     - name: Print Poetry version
       run: poetry --version
+      shell: bash
+    - name: Log directory contents for debugging
+      if: failure()
+      run: ls -al "$POETRY_BIN_DIR" "$POETRY_HOME" "$POETRY_HOME_BIN"
       shell: bash
