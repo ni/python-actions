@@ -6,10 +6,10 @@ inputs:
     default: ${{ github.workspace }}
   expected-version:
     description: >
-      The expected version. By default, this is `github.ref_name`, which is the
-      tag for a `release` event. If the version has a leading 'v', it will be
-      stripped.
-    default: ${{ github.ref_name }}
+      The expected version. By default, this is `github.event.release.tag_name`
+      for release events and `github.ref_name` otherwise. If the version has a
+      leading 'v', it will be stripped.
+    default: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref_name }}
 runs:
   using: composite
   steps:
