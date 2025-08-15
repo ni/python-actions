@@ -64,6 +64,8 @@ jobs:
             exit 1
           fi
         shell: bash
+      - name: Install project
+        run: poetry install -v
 
   test_setup_poetry_cache_hit:
     name: Test setup-poetry (cache hit)
@@ -96,6 +98,8 @@ jobs:
             exit 1
           fi
         shell: bash
+      - name: Install project
+        run: poetry install -v
   
   test_setup_poetry_no_cache:
     name: Test setup-poetry (no cache)
@@ -130,7 +134,9 @@ jobs:
             exit 1
           fi
         shell: bash
-  
+      - name: Install project
+        run: poetry install -v
+
   test_check_project_version:
     name: Test check-project-version
     runs-on: ubuntu-latest
