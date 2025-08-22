@@ -71,7 +71,7 @@ runs:
           print("| Project | Version | Path |", file=output)
           print("|---------|---------|------|", file=output)
           for project in changed_projects:
-              print(f"| {project_info[project]['name']} | {project_info[project]['version']} | {project} |") >> "$GITHUB_OUTPUT"
+              print(f"| {project_info[project]['name']} | {project_info[project]['version']} | {project} |", file=output)
           print("EOF", file=output)
     shell: python
   - name: Create pull request
