@@ -52,7 +52,7 @@ runs:
     id: get-pr-details
     run: |
       import pathlib, os, subprocess
-      changed_files = [pathlib.Path(file) for file in subprocess.check_output("git diff --name-only", encoding="ascii").split()]
+      changed_files = [pathlib.Path(file) for file in subprocess.check_output(["git", "diff", "--name-only"], encoding="ascii").split()]
       changed_projects = [file for file in changed_files if file.name == "pyproject.toml"]
       project_info = {}
       for project in changed_projects:
