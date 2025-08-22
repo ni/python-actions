@@ -52,11 +52,11 @@ runs:
     id: get-pr-details
     run: |
       import pathlib, os, subprocess
-      changed_files = [pathlib.Path(file) for file in subprocess.check_output(["git", "diff", "--name-only"], encoding="ascii").split()]
+      changed_files = [pathlib.Path(file) for file in subprocess.run(["git", "diff", "--name-only"], capture_output=True, check=True, text=True).stdout.split()]
       changed_projects = [file for file in changed_files if file.name == "pyproject.toml"]
       project_info = {}
       for project in changed_projects:
-          name, version = subprocess.check_output(["poetry", "version", "-C", str(project.parent)], encoding="ascii").split()
+          name, version = subprocess.run(["poetry", "version", "-C", str(project.parent)], capture_output=True, check=True, text=True).stdout.split()
           project_info[project] = {"name": name, "version": version}
       if len(changed_projects) == 1:
           title = "chore: Update project {} to v{}".format(project_info[changed_projects[0]]["name"], project_info[changed_projects[0]]["version"])
