@@ -119,7 +119,7 @@ workflows.
 This action installs Poetry using the Python version that was selected by the `setup-python`
 action, so you must call `setup-python` first.
 
-By default, this action installs Poetry 2.1.3.
+By default, this action installs Poetry 2.1.4.
 
 ### Usage
 
@@ -139,7 +139,7 @@ steps:
 - uses: ni/python-actions/setup-python@v0.2
 - uses: ni/python-actions/setup-poetry@v0.2
   with:
-    poetry-version: 2.1.3
+    poetry-version: 2.1.4
 - run: poetry install -v
 ```
 
