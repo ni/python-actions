@@ -57,7 +57,7 @@ runs:
       project_info = {}
       for project in changed_projects:
           name, version = subprocess.check_output(["poetry", "version", "-C", str(project.parent)], encoding="ascii").split()
-          project_info[file] = {"name": name, "version": version}
+          project_info[project] = {"name": name, "version": version}
       if len(changed_projects) == 1:
           title = "chore: Update project {} to v{}".format(project_info[changed_projects[0]]["name"], project_info[changed_projects[0]]["version"])
       else:
