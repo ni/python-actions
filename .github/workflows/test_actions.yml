@@ -14,7 +14,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.13t, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -48,7 +48,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -75,7 +75,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -107,7 +107,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Set up Python
         uses: ./setup-python
       - name: Set up Poetry
@@ -170,7 +170,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Set up Python
         uses: ./setup-python
       - name: Set up Poetry
