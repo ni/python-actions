@@ -1,10 +1,11 @@
 # `ni/python-actions/update-project-version`
 
-The `update-project-version` action uses Poetry to update the version of a Python project and
-creates a pull request to modify its `pyproject.toml` file. Publish workflows can use this to update
-the version in `pyproject.toml` for the next build.
+The `ni/python-actions/update-project-version` action uses Poetry to update the version of a Python
+project and creates a pull request to modify its `pyproject.toml` file. Publish workflows can use
+this to update the version in `pyproject.toml` for the next build.
 
-This action requires Poetry, so you must call `setup-python` and `setup-poetry` first.
+This action requires Poetry, so you must call `ni/python-actions/setup-python` and
+`ni/python-actions/setup-poetry` first.
 
 Creating a pull request requires the workflow or job to have the following `GITHUB_TOKEN`
 permissions:

@@ -1,10 +1,10 @@
 # `ni/python-actions/setup-poetry`
 
-The `setup-poetry` action installs Poetry, adds it to the PATH, and caches it to speed up
-workflows.
+The `ni/python-actions/setup-poetry` action installs Poetry, adds it to the PATH, and caches it to
+speed up workflows.
 
-This action installs Poetry using the Python version that was selected by the `setup-python`
-action, so you must call `setup-python` first.
+This action installs Poetry using the Python version that was selected by the
+`ni/python-actions/setup-python` action, so you must call `ni/python-actions/setup-python` first.
 
 By default, this action installs Poetry 2.1.4.
 

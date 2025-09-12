@@ -1,13 +1,14 @@
 # `ni/python-actions/check-project-version`
 
-The `check-project-version` action uses Poetry to get the version of a Python project and checks
-that it matches an expected version. Publish workflows can use this to verify that the release tag
-matches the version number in `pyproject.toml`.
+The `ni/python-actions/check-project-version` action uses Poetry to get the version of a Python
+project and checks that it matches an expected version. Publish workflows can use this to verify
+that the release tag matches the version number in `pyproject.toml`.
 
 By default, this action checks against `github.ref_name`, which is the GitHub release tag for GitHub
 release events.
 
-This action requires Poetry, so you must call `setup-python` and `setup-poetry` first.
+This action requires Poetry, so you must call `ni/python-actions/setup-python` and
+`ni/python-actions/setup-poetry` first.
 
 ## Usage
 

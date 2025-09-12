@@ -1,6 +1,6 @@
 # `ni/python-actions/setup-python`
 
-The `setup-python` action installs Python and adds it to the PATH.
+The `ni/python-actions/setup-python` action installs Python and adds it to the PATH.
 
 It is a thin wrapper for https://github.com/actions/setup-python which is intended to
 single-source the default Python version for multiple NI Python projects.
