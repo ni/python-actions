@@ -1,6 +1,6 @@
 name: Check analyzers
 description: >
-  This workflow checks the code quality of a Python package using various
+  This workflow checks the code quality of a Python project using various
   analyzers like linters and type checkers, including ni-python-styleguide,
   mypy, bandit, and pyright. It is designed to be reusable across different
   projects and can be easily integrated into existing CI/CD pipelines.
@@ -11,8 +11,9 @@ on:
       project-directory:
         description: Path to the directory containing pyproject.toml.
         default: ${{ github.workspace }}
-      install-extras:
-        description: 'List of Poetry extras to install (comma separated)'
+      extras:
+        # E.g. "docs drivers"
+        description: 'List of Poetry extras to install (separated by spaces)'
         default: ''
         required: false
         type: string
@@ -53,7 +54,11 @@ jobs:
       - name: Install ${{ steps.get_package_info.outputs.name }}
         run: |
           if [ "${{ inputs.install-extras }}" != "" ]; then
-            poetry install -v --extras "${{ inputs.install-extras }}"
+            EXTRAS_ARGS=""
+            for extra in ${{ inputs.extras }}; do
+              EXTRAS_ARGS="$EXTRAS_ARGS -E $extra"
+            done
+            poetry install -v $EXTRAS_ARGS
           else
             poetry install -v
           fi
@@ -63,8 +68,9 @@ jobs:
         run: poetry run mypy
       - name: Mypy static analysis (Windows)
         run: poetry run mypy --platform win32
+        # Assumes there are 'targets' in pyproject.toml for Bandit
       - name: Bandit security checks
-        run: poetry run bandit -c pyproject.toml -r src/
+        run: poetry run bandit -c pyproject.toml -r
       - name: Add virtualenv to the path for pyright-action
         run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
       - name: Pyright static analysis (Linux)
