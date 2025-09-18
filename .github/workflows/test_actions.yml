@@ -228,6 +228,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         uses: ./setup-poetry
+      - name: Create project
+        run: poetry new test-project
       - name: Check that the project was created
         run: |
           if [ ! -f test-project/pyproject.toml ]; then
