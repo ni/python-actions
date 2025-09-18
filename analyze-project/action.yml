@@ -67,8 +67,9 @@ runs:
             except PackageNotFoundError:
                 return "false"
 
-        print(f"::set-output name=mypy::{is_installed('mypy')}")
-        print(f"::set-output name=pyright::{is_installed('pyright')}")
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write(f"mypy={is_installed('mypy')}\n")
+            f.write(f"pyright={is_installed('pyright')}\n")
         EOF
       shell: bash
     - name: Echo check_tools outputs
