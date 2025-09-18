@@ -58,9 +58,15 @@ runs:
       working-directory: ${{ inputs.project-directory }}
       shell: bash
     - name: Add virtualenv to the path for pyright-action
-      run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
-      working-directory: ${{ inputs.project-directory }}
       shell: bash
+      run: |
+        VENV_PATH="$(poetry env info --path)"
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          echo "$VENV_PATH/Scripts" >> $GITHUB_PATH
+        else
+          echo "$VENV_PATH/bin" >> $GITHUB_PATH
+        fi
+      working-directory: ${{ inputs.project-directory }}
     - name: Pyright static analysis
       uses: jakebailey/pyright-action@b5d50e5cde6547546a5c4ac92e416a8c2c1a1dfe # v2.3.2
       with:
