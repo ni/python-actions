@@ -15,6 +15,12 @@ dependencies = [
 [tool.poetry]
 packages = [{include = "test_project", from = "src"}]
 
+[tool.mypy]
+mypy_path = "."
+files = "."
+namespace_packages = true
+strict = true
+explicit_package_bases = true
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
