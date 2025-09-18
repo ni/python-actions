@@ -28,15 +28,16 @@ runs:
         echo "name=$name" >> $GITHUB_OUTPUT
         echo "version=$version" >> $GITHUB_OUTPUT
       working-directory: ${{ inputs.project-directory }}
+      shell: bash
     - name: Check for lock changes
       run: poetry check --lock
       working-directory: ${{ inputs.project-directory }}
+      shell: bash
     - name: Cache virtualenv
       uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
         path: ${{ inputs.project-directory }}/.venv
         key: ${{ inputs.package-name }}-${{ runner.os }}-py${{ steps.setup-python.outputs.python-version }}-${{ hashFiles(format('{0}/poetry.lock', inputs.project-directory)) }}
-      working-directory: ${{ inputs.project-directory }}
     - name: Install ${{ steps.get_package_info.outputs.name }}
       run: |
         if [ "${{ inputs.install-extras }}" != "" ]; then
@@ -49,15 +50,19 @@ runs:
           poetry install -v
         fi
       working-directory: ${{ inputs.project-directory }}
+      shell: bash
     - name: Lint
       run: poetry run ni-python-styleguide lint
       working-directory: ${{ inputs.project-directory }}
+      shell: bash
     - name: Mypy static analysis
       run: poetry run mypy
       working-directory: ${{ inputs.project-directory }}
+      shell: bash
     - name: Add virtualenv to the path for pyright-action
       run: echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
       working-directory: ${{ inputs.project-directory }}
+      shell: bash
     - name: Pyright static analysis
       uses: jakebailey/pyright-action@b5d50e5cde6547546a5c4ac92e416a8c2c1a1dfe # v2.3.2
       with:
