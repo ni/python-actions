@@ -212,6 +212,34 @@ jobs:
           project-directory: test-project
           expected-version: 1.0.2.dev1
 
+  test_analyze_project:
+    name: Test analyze-project
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Set up Python
+        uses: ./setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Poetry
+        uses: ./setup-poetry
+      - name: Check that the project was created
+        run: |
+          if [ ! -f test-project/pyproject.toml ]; then
+            echo "::error title=Test Failure::The project file does not exist."
+            exit 1
+          fi
+        shell: bash
+      - name: Analyze Python Project
+        uses: ./analyze-project
+        with:
+          project-directory: test-project
+
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a
   # lot of corner cases that make this harder than it should be; see See
