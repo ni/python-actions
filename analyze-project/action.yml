@@ -19,25 +19,25 @@ inputs:
 runs:
   using: composite
   steps:
-- name: Check for mypy and pyright installation
-  id: check_tools
-  run: |
+    - name: Check for mypy and pyright installation
+      id: check_tools
+      run: |
         python - <<EOF
-    import os
-    from importlib.metadata import version, PackageNotFoundError
+import os
+from importlib.metadata import version, PackageNotFoundError
 
-    def is_installed(pkg_name):
-        try:
-            version(pkg_name)
-            return "true"
-        except PackageNotFoundError:
-            return "false"
+def is_installed(pkg_name):
+    try:
+        version(pkg_name)
+        return "true"
+    except PackageNotFoundError:
+        return "false"
 
-    print(f"::set-output name=mypy::{is_installed('mypy')}")
-    print(f"::set-output name=pyright::{is_installed('pyright')}")
-    EOF
-  shell: bash
-- name: Get package name and version
+print(f"::set-output name=mypy::{is_installed('mypy')}")
+print(f"::set-output name=pyright::{is_installed('pyright')}")
+EOF
+      shell: bash
+    - name: Get package name and version
       id: get_package_info
       run: |
         result=$(poetry version -C "${{ inputs.project-directory }}")
