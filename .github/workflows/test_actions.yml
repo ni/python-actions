@@ -232,8 +232,8 @@ jobs:
         run: poetry new test-project
       - name: Restrict Python version in pyproject.toml
         run: |
-          poetry run poetry env use ${{ matrix.python-version }} -C test-project
-          poetry run poetry add 'python@>=3.7,<4.0' --dev -C test-project
+          poetry env use ${{ matrix.python-version }} -C test-project
+          poetry add 'python@>=3.7,<4.0' --dev -C test-project
       - name: Add ni-python-styleguide to the project
         run: poetry add ni-python-styleguide -C test-project
       - name: Create poetry.lock
