@@ -232,6 +232,8 @@ jobs:
         run: poetry new test-project
       - name: Create poetry.lock
         run: poetry lock -C test-project
+      - name: Add ni-python-styleguide to the project
+        run: poetry add ni-python-styleguide -C test-project
       - name: Check that the project was created
         run: |
           if [ ! -f test-project/pyproject.toml ]; then
