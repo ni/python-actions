@@ -228,66 +228,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         uses: ./setup-poetry
-      - name: Create project
-        run: poetry new test-project --python ">=3.9,<4.0"
-      - name: Add docstrings to source and test files
-        shell: python
+      - name: Copy test project files
         run: |
-          import os
-          from pathlib import Path
-
-          def add_docstring_to_file(filepath):
-              """Adds a module docstring to a Python file."""
-              if filepath.suffix != '.py':
-                  return
-
-              with open(filepath, 'r+') as f:
-                  content = f.read()
-                  # Check if a docstring already exists
-                  if not content.startswith(('"""', "'''")):
-                      f.seek(0, 0) # Go to the start of the file
-                      f.write('"""Module docstring."""\n')
-                      f.write(content)
-
-          # Walk through the project directory to find all Python files
-          for root, _, files in os.walk('.'):
-              for file in files:
-                  file_path = Path(root) / file
-                  add_docstring_to_file(file_path)
-
-          def add_docstring_to_file(filepath):
-              """Adds a module docstring to a Python file."""
-              if filepath.suffix != '.py':
-                  return
-        
-              with open(filepath, 'r+') as f:
-                  content = f.read()
-                  # Check if a docstring already exists
-                  if not content.startswith(('"""', "'''")):
-                      f.seek(0, 0) # Go to the start of the file
-                      f.write('"""Module docstring."""\n')
-                      f.write(content)
-
-          # Walk through the project directory to find all Python files
-          for root, _, files in os.walk('.'):
-              for file in files:
-                  file_path = Path(root) / file
-                  add_docstring_to_file(file_path)
-      - name: Add ni-python-styleguide to the project
-        run: poetry add ni-python-styleguide -C test-project
-      - name: Add mypy to the project
-        run: poetry add mypy -C test-project
-      - name: Show pyproject.toml
-        run: cat test-project/pyproject.toml
-      - name: Create poetry.lock
-        run: poetry lock -C test-project
-      - name: Check that the project was created
-        run: |
-          if [ ! -f test-project/pyproject.toml ]; then
-            echo "::error title=Test Failure::The project file does not exist."
-            exit 1
-          fi
-        shell: bash
+          cp -r ./templates/test-project ./test-project
       - name: Analyze Python Project
         uses: ./analyze-project
         with:
