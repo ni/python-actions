@@ -230,6 +230,14 @@ jobs:
         uses: ./setup-poetry
       - name: Create project
         run: poetry new test-project --python ">=3.7,<4.0"
+      - name: Add docstring to Python files
+        run: |
+          for file in test-project/src/test_project/*.py; do
+            echo '"""Module docstring."""' | cat - "$file" > temp && mv temp "$file"
+            sed -i '/def /a \    """Function docstring."""\n    pass' "$file"
+          done
+          find test-project/tests -name "*.py" -exec sed -i '1i"""Test file."""' {} +
+        shell: bash        
       - name: Show pyproject.toml
         run: cat test-project/pyproject.toml
       - name: Add ni-python-styleguide to the project
