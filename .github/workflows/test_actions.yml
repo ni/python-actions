@@ -230,27 +230,49 @@ jobs:
         uses: ./setup-poetry
       - name: Create project
         run: poetry new test-project --python ">=3.7,<4.0"
-      - name: Add docstring to source files
+      - name: Add docstrings to source and test files
+        shell: python
         run: |
-          for file in test-project/src/test_project/*.py; do
-            echo '"""Module docstring."""' | cat - "$file" > temp && mv temp "$file"
-            sed -i '' '/def /a\
-              """Function docstring."""
-              pass
-            ' "$file"
-          done
-          find test-project/tests -name "*.py" -exec sed -i '1i"""Test file."""' {} +
-        shell: bash
-      - name: Add docstring to test files
-        run: |
-          if [[ "$RUNNER_OS" == "macOS" ]]; then
-            find test-project/tests -name "*.py" -exec sed -i '' '1i\
-            """Test file."""
-            ' {} +
-          else
-            find test-project/tests -name "*.py" -exec sed -i '1i"""Test file."""' {} +
-          fi
-        shell: bash
+          import os
+          from pathlib import Path
+
+          def add_docstring_to_file(filepath):
+              """Adds a module docstring to a Python file."""
+              if filepath.suffix != '.py':
+                  return
+
+              with open(filepath, 'r+') as f:
+                  content = f.read()
+                  # Check if a docstring already exists
+                  if not content.startswith(('"""', "'''")):
+                      f.seek(0, 0) # Go to the start of the file
+                      f.write('"""Module docstring."""\n')
+                      f.write(content)
+
+          # Walk through the project directory to find all Python files
+          for root, _, files in os.walk('.'):
+              for file in files:
+                  file_path = Path(root) / file
+                  add_docstring_to_file(file_path)
+
+          def add_docstring_to_file(filepath):
+              """Adds a module docstring to a Python file."""
+              if filepath.suffix != '.py':
+                  return
+        
+              with open(filepath, 'r+') as f:
+                  content = f.read()
+                  # Check if a docstring already exists
+                  if not content.startswith(('"""', "'''")):
+                      f.seek(0, 0) # Go to the start of the file
+                      f.write('"""Module docstring."""\n')
+                      f.write(content)
+
+          # Walk through the project directory to find all Python files
+          for root, _, files in os.walk('.'):
+              for file in files:
+                  file_path = Path(root) / file
+                  add_docstring_to_file(file_path)
       - name: Show pyproject.toml
         run: cat test-project/pyproject.toml
       - name: Add ni-python-styleguide to the project
