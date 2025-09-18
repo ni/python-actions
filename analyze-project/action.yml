@@ -65,4 +65,4 @@ runs:
       uses: jakebailey/pyright-action@b5d50e5cde6547546a5c4ac92e416a8c2c1a1dfe # v2.3.2
       with:
         version: PATH
-        working-directory: .
+        working-directory: ${{ inputs.project-directory }}
