@@ -240,7 +240,7 @@ jobs:
       - name: Analyze Python Project
         uses: ./analyze-project
         with:
-          project-directory: test-project
+          project-directory: ${{ github.workspace }}/test-project
 
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a
