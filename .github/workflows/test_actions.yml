@@ -229,7 +229,7 @@ jobs:
       - name: Set up Poetry
         uses: ./setup-poetry
       - name: Create project
-        run: poetry new test-project --python ">=3.7,<4.0"
+        run: poetry new test-project --python ">=3.9,<4.0"
       - name: Add docstrings to source and test files
         shell: python
         run: |
