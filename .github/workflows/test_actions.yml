@@ -230,11 +230,8 @@ jobs:
         uses: ./setup-poetry
       - name: Create project
         run: poetry new test-project
-      - name: Restrict Python version in pyproject.toml
-        run: |
-          poetry env use ${{ matrix.python-version }} -C test-project
       - name: Set compatible Python version in pyproject.toml
-        run: sed -i 's/^python = .*/python = ">=3.7,<4.0"/' test-project/pyproject.toml
+        run: poetry add 'python@>=3.7,<4.0' --lock --dev -C test-project || poetry add 'python@>=3.7,<4.0' -C test-project
       - name: Show pyproject.toml
         run: cat test-project/pyproject.toml
       - name: Add ni-python-styleguide to the project
