@@ -273,12 +273,12 @@ jobs:
               for file in files:
                   file_path = Path(root) / file
                   add_docstring_to_file(file_path)
-      - name: Show pyproject.toml
-        run: cat test-project/pyproject.toml
       - name: Add ni-python-styleguide to the project
         run: poetry add ni-python-styleguide -C test-project
       - name: Add mypy to the project
         run: poetry add mypy -C test-project
+      - name: Show pyproject.toml
+        run: cat test-project/pyproject.toml
       - name: Create poetry.lock
         run: poetry lock -C test-project
       - name: Check that the project was created
