@@ -22,14 +22,15 @@ runs:
     - name: Get project name and version
       id: get_project_info
       run: |
-        result=$(poetry version -C "${{ inputs.project-directory }}")
+        result=$(poetry version")
         name=$(echo "$result" | awk '{print $1}')
         version=$(echo "$result" | awk '{print $2}')
         echo "name=$name" >> $GITHUB_OUTPUT
         echo "version=$version" >> $GITHUB_OUTPUT
-        project_path=$(poetry env info --path -C "${{ inputs.project-directory }}")
+        project_path=$(poetry env info --path)
         echo "venv-path=$project_path" >> $GITHUB_OUTPUT
       shell: bash
+      working-directory: ${{ inputs.project-directory }}
     - name: Check for lock changes
       run: poetry check --lock -C "${{ inputs.project-directory }}"
       shell: bash
