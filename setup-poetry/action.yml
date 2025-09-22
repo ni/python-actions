@@ -27,24 +27,27 @@ runs:
     - name: Set paths (Linux/Mac)
       if: runner.os != 'Windows'
       run: |
-        echo "POETRY_BIN_DIR=$HOME/.local/poetry/bin" >> "$GITHUB_ENV"
-        echo "POETRY_HOME=$HOME/.local/poetry/home" >> "$GITHUB_ENV"
-        echo "POETRY_HOME_BIN=$HOME/.local/poetry/home/bin" >> "$GITHUB_ENV"
-        echo "$HOME/.local/poetry/bin" >> "$GITHUB_PATH"
+        echo "POETRY_BIN_DIR=$GITHUB_WORKSPACE/.cache/poetry/bin" >> "$GITHUB_ENV"
+        echo "POETRY_CONFIG_DIR=$GITHUB_WORKSPACE/.cache/poetry/config" >> "$GITHUB_ENV"
+        echo "POETRY_HOME=$GITHUB_WORKSPACE/.cache/poetry/home" >> "$GITHUB_ENV"
+        echo "POETRY_HOME_BIN=$GITHUB_WORKSPACE/.cache/poetry/home/bin" >> "$GITHUB_ENV"
+        echo "$GITHUB_WORKSPACE/.cache/poetry/bin" >> "$GITHUB_PATH"
       shell: bash
     - name: Set paths (Windows)
       if: runner.os == 'Windows'
       run: |
-        Add-Content $env:GITHUB_ENV "POETRY_BIN_DIR=$HOME\.local\poetry\bin"
-        Add-Content $env:GITHUB_ENV "POETRY_HOME=$HOME\.local\poetry\home"
-        Add-Content $env:GITHUB_ENV "POETRY_HOME_BIN=$HOME\.local\poetry\home\Scripts"
-        Add-Content $env:GITHUB_PATH "$HOME\.local\poetry\bin"
+        Add-Content $env:GITHUB_ENV "POETRY_BIN_DIR=$env:GITHUB_WORKSPACE\.cache\poetry\bin"
+        Add-Content $env:GITHUB_ENV "POETRY_CONFIG_DIR=$env:GITHUB_WORKSPACE\.cache\poetry\config"
+        Add-Content $env:GITHUB_ENV "POETRY_HOME=$env:GITHUB_WORKSPACE\.cache\poetry\home"
+        Add-Content $env:GITHUB_ENV "POETRY_HOME_BIN=$env:GITHUB_WORKSPACE\.cache\poetry\home\Scripts"
+        Add-Content $env:GITHUB_PATH "$env:GITHUB_WORKSPACE\.cache\poetry\bin"
       shell: pwsh
     - name: Copy paths from $GITHUB_ENV to $GITHUB_OUTPUT
       id: copy-paths
       run: |
         echo "poetry-bin-dir=$POETRY_BIN_DIR" >> "$GITHUB_OUTPUT"
         echo "poetry-home=$POETRY_HOME" >> "$GITHUB_OUTPUT"
+        echo "poetry-hash=$(echo "$POETRY_BIN_DIR" | sha256sum | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
       shell: bash
     - name: Cache poetry
       if: ${{ inputs.use-cache == 'true' }}
@@ -55,7 +58,7 @@ runs:
         path: |
           ${{ steps.copy-paths.outputs.poetry-bin-dir }}/poetry*
           ${{ steps.copy-paths.outputs.poetry-home }}          
-        key: poetry${{ inputs.poetry-version }}-${{ runner.os }}-py${{ env.pythonVersion }}
+        key: poetry${{ inputs.poetry-version }}-${{ runner.os }}-py${{ env.pythonVersion }}-${{ steps.copy-paths.outputs.poetry-hash}}
     - name: Install Poetry
       if: steps.cache-poetry.outputs.cache-hit != 'true'
       run: |
