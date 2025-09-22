@@ -25,7 +25,7 @@ runs:
         result=$(poetry version)
         name=$(echo "$result" | awk '{print $1}')
         version=$(echo "$result" | awk '{print $2}')
-        path=$(poetry env info --path)
+        path=$("poetry env info --path")
         echo "name=$name" >> "$GITHUB_OUTPUT"
         echo "version=$version" >> "$GITHUB_OUTPUT"
       shell: bash
