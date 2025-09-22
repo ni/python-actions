@@ -230,11 +230,11 @@ jobs:
         uses: ./setup-poetry
       - name: Copy test project files
         run: |
-          cp -r ./templates/test-project ./test-project
+          cp -r ./.github/test_projects/minimal ./minimal
       - name: Analyze Python Project
         uses: ./analyze-project
         with:
-          project-directory: ${{ github.workspace }}/test-project
+          project-directory: ${{ github.workspace }}/minimal
 
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a
