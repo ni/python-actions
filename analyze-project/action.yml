@@ -22,7 +22,7 @@ runs:
     - name: Get project name and version
       id: get_project_info
       run: |
-        result=$(poetry version")
+        result=$(poetry version)
         name=$(echo "$result" | awk '{print $1}')
         version=$(echo "$result" | awk '{print $2}')
         echo "name=$name" >> $GITHUB_OUTPUT
