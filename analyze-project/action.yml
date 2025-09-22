@@ -56,7 +56,6 @@ runs:
     - name: Check for mypy and pyright installation
       id: check_tools
       run: |
-        python - <<EOF
         import os
         from importlib.metadata import version, PackageNotFoundError
 
@@ -67,11 +66,10 @@ runs:
             except PackageNotFoundError:
                 return "false"
 
-        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-            f.write(f"mypy={is_installed('mypy')}\n")
-            f.write(f"pyright={is_installed('pyright')}\n")
-        EOF
-      shell: bash
+        with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+            print(f"mypy={is_installed('mypy')}", file=output)
+            print(f"pyright={is_installed('pyright')}", file=output)
+      shell: python
     - name: Echo check_tools outputs
       run: |
         echo "mypy installed: ${{ steps.check_tools.outputs.mypy }}"
@@ -86,12 +84,7 @@ runs:
       if: steps.check_tools.outputs.pyright == 'true'
       shell: bash
       run: |
-        VENV_PATH="$(poetry env info --path)"
-        if [[ "$RUNNER_OS" == "Windows" ]]; then
-          echo "$VENV_PATH/Scripts" >> $GITHUB_PATH
-        else
-          echo "$VENV_PATH/bin" >> $GITHUB_PATH
-        fi
+        echo "$(dirname $(poetry env info --executable))" >> $GITHUB_PATH
       working-directory: ${{ inputs.project-directory }}
     - name: Pyright static analysis
       if: steps.check_tools.outputs.pyright == 'true'
