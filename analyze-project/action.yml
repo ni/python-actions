@@ -30,8 +30,8 @@ runs:
         echo "name=$name" >> "$GITHUB_OUTPUT"
         echo "version=$version" >> "$GITHUB_OUTPUT"
         echo "What options do we have?"
-        (poetry env info --help; exit 0)
-        (poetry env info --path; exit 0)
+        (poetry env info --help || exit 0)
+        (poetry env info --path || exit 0)
         dude="$(poetry env info --path)"
         echo $dude
         echo "venv=$dude" >> "$GITHUB_OUTPUT"
