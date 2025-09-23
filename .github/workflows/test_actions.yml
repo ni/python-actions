@@ -216,6 +216,7 @@ jobs:
     name: Test analyze-project
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: [3.11]
