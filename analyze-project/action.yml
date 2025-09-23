@@ -25,9 +25,11 @@ runs:
         result=$(poetry version)
         name=$(echo "$result" | awk '{print $1}')
         version=$(echo "$result" | awk '{print $2}')
-        path=$("poetry env info --path")
+        echo $name
+        echo $version
         echo "name=$name" >> "$GITHUB_OUTPUT"
         echo "version=$version" >> "$GITHUB_OUTPUT"
+        stuff=$(poetry env info)
       shell: bash
       working-directory: ${{ inputs.project-directory }}
     - name: Check for lock changes
