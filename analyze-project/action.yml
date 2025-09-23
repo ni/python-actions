@@ -29,9 +29,9 @@ runs:
         echo $version
         echo "name=$name" >> "$GITHUB_OUTPUT"
         echo "version=$version" >> "$GITHUB_OUTPUT"
-        venv-path="$(poetry env info --path)"
-        echo $venv-path
-        echo "venv=$venv-path" >> "$GITHUB_OUTPUT"
+        venv="$(poetry env info --path)"
+        echo $venv
+        echo "venv=$venv" >> "$GITHUB_OUTPUT"
       shell: bash
       working-directory: ${{ inputs.project-directory }}
     - name: Check for lock changes
