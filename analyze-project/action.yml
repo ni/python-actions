@@ -29,7 +29,7 @@ runs:
         echo $version
         echo "name=$name" >> "$GITHUB_OUTPUT"
         echo "version=$version" >> "$GITHUB_OUTPUT"
-        stuff=$(poetry env info)
+        stuff=$(poetry env info --path)
         echo $stuff
       shell: bash
       working-directory: ${{ inputs.project-directory }}
