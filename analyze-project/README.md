@@ -12,9 +12,9 @@ This action requires Poetry, so you must call `ni/python-actions/setup-python` a
 
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.2
-- uses: ni/python-actions/setup-poetry@v0.2
-- uses: ni/python-actions/analyze-project@v0.2
+- uses: ni/python-actions/setup-python@v0
+- uses: ni/python-actions/setup-poetry@v0
+- uses: ni/python-actions/analyze-project@v0
 ```
 
 ## Inputs
