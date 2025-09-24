@@ -12,11 +12,15 @@ This action requires Poetry, so you must call `ni/python-actions/setup-python` a
 
 ## Usage
 
+> **Note**
+> These examples use `@v0`, but pinning to a commit hash or full release tag is recommended for
+> build reproducibility and security.
+
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.2
-- uses: ni/python-actions/setup-poetry@v0.2
-- uses: ni/python-actions/check-project-version@v0.2
+- uses: ni/python-actions/setup-python@v0
+- uses: ni/python-actions/setup-poetry@v0
+- uses: ni/python-actions/check-project-version@v0
   if: github.event_name == 'release'
 ```
 
@@ -27,7 +31,7 @@ steps:
 You can specify `project-directory` to check a project located in a subdirectory.
 
 ```yaml
-- uses: ni/python-actions/check-project-version@v0.2
+- uses: ni/python-actions/check-project-version@v0
   with:
     project-directory: packages/foo
 ```
@@ -37,7 +41,7 @@ You can specify `project-directory` to check a project located in a subdirectory
 You can specify `expected-version` to check against something other than `github.ref_name`.
 
 ```yaml
-- uses: ni/python-actions/check-project-version@v0.2
+- uses: ni/python-actions/check-project-version@v0
   with:
     expected-version: ${{ steps.get-expected-version.outputs.version }}
 ```

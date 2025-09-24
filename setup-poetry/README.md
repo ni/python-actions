@@ -10,10 +10,14 @@ By default, this action installs Poetry 2.1.4.
 
 ## Usage
 
+> **Note**
+> These examples use `@v0`, but pinning to a commit hash or full release tag is recommended for
+> build reproducibility and security.
+
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.2
-- uses: ni/python-actions/setup-poetry@v0.2
+- uses: ni/python-actions/setup-python@v0
+- uses: ni/python-actions/setup-poetry@v0
 - run: poetry install -v
 ```
 
@@ -23,8 +27,8 @@ steps:
 
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.2
-- uses: ni/python-actions/setup-poetry@v0.2
+- uses: ni/python-actions/setup-python@v0
+- uses: ni/python-actions/setup-poetry@v0
   with:
     poetry-version: 2.1.4
 - run: poetry install -v

@@ -9,9 +9,13 @@ By default, this action installs Python 3.11.9.
 
 ## Usage
 
+> **Note**
+> These examples use `@v0`, but pinning to a commit hash or full release tag is recommended for
+> build reproducibility and security.
+
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.2
+- uses: ni/python-actions/setup-python@v0
 ```
 
 ## Inputs
@@ -25,7 +29,7 @@ strategy:
   matrix:
     python-version: [3.9, '3.10', 3.11, 3.12, 3.13]
 steps:
-- uses: ni/python-actions/setup-python@v0.2
+- uses: ni/python-actions/setup-python@v0
   with:
     python-version: ${{ matrix.python-version }}
 ```
@@ -38,7 +42,7 @@ You can use the `python-version` output to get the actual version of Python, whi
 
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.2
+- uses: ni/python-actions/setup-python@v0
   id: setup-python
 - uses: actions/cache@v4
   with:
@@ -61,7 +65,7 @@ You can also use the `python-path` output to get the path to the Python interpre
 
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.2
+- uses: ni/python-actions/setup-python@v0
   id: setup-python
 - run: pipx install <package> --python ${{ steps.setup-python.outputs.python-version }}
 ```

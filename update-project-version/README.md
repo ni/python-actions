@@ -18,11 +18,15 @@ permissions:
 
 ## Usage
 
+> **Note**
+> These examples use `@v0`, but pinning to a commit hash or full release tag is recommended for
+> build reproducibility and security.
+
 ```yaml
 steps:
-- uses: ni/python-actions/setup-python@v0.2
-- uses: ni/python-actions/setup-poetry@v0.2
-- uses: ni/python-actions/update-project-version@v0.2
+- uses: ni/python-actions/setup-python@v0
+- uses: ni/python-actions/setup-poetry@v0
+- uses: ni/python-actions/update-project-version@v0
 ```
 
 ## Inputs
@@ -32,7 +36,7 @@ steps:
 You can specify `project-directory` to update a project located in a subdirectory.
 
 ```yaml
-- uses: ni/python-actions/update-project-version@v0.2
+- uses: ni/python-actions/update-project-version@v0
   with:
     project-directory: packages/foo
 ```
@@ -44,7 +48,7 @@ You can specify `branch-prefix` to customize the pull request branch names. The 
 `users/build/update-project-version-releases-1.1`.
 
 ```yaml
-- uses: ni/python-actions/update-project-version@v0.2
+- uses: ni/python-actions/update-project-version@v0
   with:
     branch-prefix: users/python-build/
 ```
@@ -55,15 +59,15 @@ You can use `create-pull-request` and `project-directory` to update multiple pro
 pull request.
 
 ```yaml
-- uses: ni/python-actions/update-project-version@v0.2
+- uses: ni/python-actions/update-project-version@v0
   with:
     project-directory: packages/foo
     create-pull-request: false
-- uses: ni/python-actions/update-project-version@v0.2
+- uses: ni/python-actions/update-project-version@v0
   with:
     project-directory: packages/bar
     create-pull-request: false
-- uses: ni/python-actions/update-project-version@v0.2
+- uses: ni/python-actions/update-project-version@v0
   with:
     project-directory: packages/baz
     create-pull-request: true
