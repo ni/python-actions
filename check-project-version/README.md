@@ -12,7 +12,7 @@ This action requires Poetry, so you must call `ni/python-actions/setup-python` a
 
 ## Usage
 
-> **Note**
+> [!NOTE]
 > These examples use `@v0`, but pinning to a commit hash or full release tag is recommended for
 > build reproducibility and security.
 

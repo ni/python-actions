@@ -10,7 +10,7 @@ By default, this action installs Poetry 2.1.4.
 
 ## Usage
 
-> **Note**
+> [!NOTE]
 > These examples use `@v0`, but pinning to a commit hash or full release tag is recommended for
 > build reproducibility and security.
 

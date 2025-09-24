@@ -9,7 +9,7 @@ By default, this action installs Python 3.11.9.
 
 ## Usage
 
-> **Note**
+> [!NOTE]
 > These examples use `@v0`, but pinning to a commit hash or full release tag is recommended for
 > build reproducibility and security.
 
