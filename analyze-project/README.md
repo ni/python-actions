@@ -3,9 +3,7 @@
 The `ni/python-actions/update-project-version` action analyzes the code quality
 of a Python project using various linters and type checkers including
 ni-python-styleguide, mypy (if the 'mypy' package is installed), and pyright
-(if the 'pyright' package is installed).uses Poetry to update the version of a Python
-project and creates a pull request to modify its `pyproject.toml` file. Publish workflows can use
-this to update the version in `pyproject.toml` for the next build.
+(if the 'pyright' package is installed).
 
 This action requires Poetry, so you must call `ni/python-actions/setup-python` and
 `ni/python-actions/setup-poetry` first.
@@ -27,7 +25,7 @@ You can specify `project-directory` to indicate the location of the pyproject.to
 file associated with the Python project you are analyzing.
 
 ```yaml
-- uses: ni/python-actions/update-project-version@v0.2
+- uses: ni/python-actions/update-project-version@v0
   with:
     project-directory: ${{ github.workspace }}/packages/myproject
 ```
@@ -38,7 +36,7 @@ If there are extras you need to install from your pyproject.toml, specify a spac
 of extra groups to install. For example, 
 
 ```yaml
-- uses: ni/python-actions/analyze-project@v0.2
+- uses: ni/python-actions/analyze-project@v0
   with:
     project-directory: ${{ github.workspace }}/packages/myproject
     extras: 'docs drivers'

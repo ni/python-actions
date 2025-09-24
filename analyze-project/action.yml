@@ -19,7 +19,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Get project name and version
+    - name: Get project info
       id: get_project_info
       run: |
         result=$(poetry version)
