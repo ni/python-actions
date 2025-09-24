@@ -1,6 +1,6 @@
 # `ni/python-actions/analyze-project`
 
-The `ni/python-actions/update-project-version` action analyzes the code quality
+The `ni/python-actions/analyze-project` action analyzes the code quality
 of a Python project using various linters and type checkers including
 ni-python-styleguide, mypy (if the 'mypy' package is installed), and pyright
 (if the 'pyright' package is installed).
