@@ -251,6 +251,7 @@ jobs:
         uses: ./setup-poetry
       - name: Copy Python project to root
         run: cp -av ${{ github.workspace }}/.github/test_projects/minimal/* ${{ github.workspace }}
+        shell: bash
       - name: Analyze Python project
         uses: ./analyze-project
 
