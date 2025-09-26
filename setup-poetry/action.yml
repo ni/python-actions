@@ -27,8 +27,10 @@ runs:
     - name: Set paths (Linux/Mac)
       if: runner.os != 'Windows'
       run: |
-        # Use the "pipeline directory" so that tools running in the workspace directory will not find the Poetry cache.
-        POETRY_ROOT="$GITHUB_WORKSPACE/../.cache/poetry"
+        # Use the "pipeline directory" so that tools that search the workspace
+        # directory for Python files will not find the Poetry cache. Use
+        # realpath to normalize the "../". 
+        POETRY_ROOT="$(realpath $GITHUB_WORKSPACE/../.cache/poetry)"
         echo "POETRY_BIN_DIR=$POETRY_ROOT/bin" >> "$GITHUB_ENV"
         echo "POETRY_CONFIG_DIR=$POETRY_ROOT/config" >> "$GITHUB_ENV"
         echo "POETRY_HOME=$POETRY_ROOT/home" >> "$GITHUB_ENV"
@@ -38,8 +40,10 @@ runs:
     - name: Set paths (Windows)
       if: runner.os == 'Windows'
       run: |
-        # Use the "pipeline directory" so that tools running in the workspace directory will not find the Poetry cache.
-        $env:POETRY_ROOT="$env:GITHUB_WORKSPACE\..\.cache\poetry"
+        # Use the "pipeline directory" so that tools that search the workspace
+        # directory for Python files will not find the Poetry cache. Use
+        # Resolve-Path to normalize the "../".
+        $env:POETRY_ROOT=(Resolve-Path -Path "$env:GITHUB_WORKSPACE\..\.cache\poetry").Path
         Add-Content $env:GITHUB_ENV "POETRY_BIN_DIR=$env:POETRY_ROOT\bin"
         Add-Content $env:GITHUB_ENV "POETRY_CONFIG_DIR=$env:POETRY_ROOT\config"
         Add-Content $env:GITHUB_ENV "POETRY_HOME=$env:POETRY_ROOT\home"
