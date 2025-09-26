@@ -233,8 +233,8 @@ jobs:
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
 
-  test_analyze_project_in_root:
-    name: Test analyze-project in root of repo
+  test_analyze_project_repo_root:
+    name: Test analyze-project in repo root
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -250,7 +250,7 @@ jobs:
       - name: Set up Poetry
         uses: ./setup-poetry
       - name: Copy Python project to root
-        run: cp -av "${{ github.workspace }}/.github/test_projects/minimal"/* "${{ github.workspace }}"
+        run: cp -av "${{ github.workspace }}/.github/test_projects/repo_root"/* "${{ github.workspace }}"
         shell: bash
       - name: Analyze Python project
         uses: ./analyze-project

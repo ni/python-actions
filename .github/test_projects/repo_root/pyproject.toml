@@ -1,0 +1,37 @@
+[project]
+name = "test-project"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Joel Dixon",email = "joel.dixon@ni.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9,<4.0"
+dynamic = ["dependencies"]
+
+[tool.poetry]
+packages = [{include = "test_project", from = "src"}]
+
+[tool.poetry.group.lint.dependencies]
+ni-python-styleguide = ">=0.4.1"
+mypy = ">=1.0"
+pyright = { version = ">=1.1.400", extras = ["nodejs"] }
+
+[tool.ni-python-styleguide]
+extend_exclude = "update-project-version"
+
+[tool.mypy]
+mypy_path = "."
+files = "."
+namespace_packages = true
+strict = true
+explicit_package_bases = true
+exclude = "update-project-version"
+
+[tool.pyright]
+include = ["src/", "tests/"]
+exclude = ["update-project-version"]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
