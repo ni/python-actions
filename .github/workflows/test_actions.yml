@@ -228,10 +228,31 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         uses: ./setup-poetry
-      - name: Analyze Python Project
+      - name: Analyze Python project
         uses: ./analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
+
+  test_analyze_project_in_root:
+    name: Test analyze-project in root of repo
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Set up Python
+        uses: ./setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Poetry
+        uses: ./setup-poetry
+      - name: Copy Python project to root
+        run: cp -av ${{ github.workspace }}/.github/test_projects/minimal ${{ github.workspace }}
+      - name: Analyze Python project
+        uses: ./analyze-project
 
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a
@@ -248,6 +269,7 @@ jobs:
       test_check_project_version,
       test_update_project_version,
       test_analyze_project,
+      test_analyze_project_in_root,
     ]
     if: ${{ !cancelled() }}
     steps:
