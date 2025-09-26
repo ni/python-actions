@@ -234,7 +234,7 @@ jobs:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
 
   test_analyze_project_repo_root:
-    name: Test analyze-project in repo root
+    name: Test analyze-project (repo root)
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -270,7 +270,7 @@ jobs:
       test_check_project_version,
       test_update_project_version,
       test_analyze_project,
-      test_analyze_project_in_root,
+      test_analyze_project_repo_root,
     ]
     if: ${{ !cancelled() }}
     steps:
