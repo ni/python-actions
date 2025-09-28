@@ -15,6 +15,11 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Echo inputs
+      run: |
+        echo "project-directory: ${{ inputs.project-directory }}"
+        echo "expect-failure: ${{ inputs.expect-failure }}"
+      shell: bash
     - name: Analyze project
       uses: ni/python-actions/analyze-project@36f9be52791272a313ccda38ac90742941770e6c
       id: analyze-project
