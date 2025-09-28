@@ -228,18 +228,30 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         uses: ./setup-poetry
-      - name: Analyze Python Project
+      - name: Analyze Valid Minimal
         uses: ./analyze-project
         id: minimal
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
-      - name: Analyze Python Project
+      - name: Analyze ni-python-styleguide Errors Project
         uses: ./analyze-project
         id: ni-python-styleguide-errors
+        continue-on-error: true
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/ni-python-styleguide-errors
       - name: Error if the previous step didn't fail
         if: steps.ni-python-styleguide-errors.outcome != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1
+      - name: Analyze mypy Errors Project
+        uses: ./analyze-project
+        id: mypy-errors
+        continue-on-error: true
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/mypy-errors
+      - name: Error if the previous step didn't fail
+        if: steps.mypy-errors.outcome != 'failure'
         run: |
           echo "::error title=Test Failure::The previous step did not fail as expected."
           exit 1

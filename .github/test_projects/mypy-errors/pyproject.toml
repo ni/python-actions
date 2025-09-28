@@ -1,0 +1,32 @@
+[project]
+name = "mypy-errors"
+version = "0.1.0"
+description = "Tests actions/analyze-project with a project that has mypy errors"
+authors = [
+    {name = "Joel Dixon",email = "joel.dixon@ni.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9,<4.0"
+dynamic = ["dependencies"]
+
+[tool.poetry]
+packages = [{include = "test_project", from = "src"}]
+
+[tool.poetry.group.lint.dependencies]
+ni-python-styleguide = ">=0.4.1"
+mypy = ">=1.0"
+pyright = { version = ">=1.1.400", extras = ["nodejs"] }
+
+[tool.mypy]
+mypy_path = "."
+files = "."
+namespace_packages = true
+strict = true
+explicit_package_bases = true
+
+[tool.pyright]
+include = ["src/", "tests/"]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
