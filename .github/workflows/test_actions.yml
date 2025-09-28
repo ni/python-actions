@@ -229,32 +229,19 @@ jobs:
       - name: Set up Poetry
         uses: ./setup-poetry
       - name: Analyze Valid Minimal
-        uses: ./analyze-project
-        id: minimal
+        uses: ./.github/actions/test_analyze_project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
       - name: Analyze ni-python-styleguide Errors Project
-        uses: ./analyze-project
-        id: ni-python-styleguide-errors
-        continue-on-error: true
+        uses: ./.github/actions/test_analyze_project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/ni-python-styleguide-errors
-      - name: Error if the previous step didn't fail
-        if: steps.ni-python-styleguide-errors.outcome != 'failure'
-        run: |
-          echo "::error title=Test Failure::The previous step did not fail as expected."
-          exit 1
+          expect-failure: 'true'
       - name: Analyze mypy Errors Project
-        uses: ./analyze-project
-        id: mypy-errors
-        continue-on-error: true
+        uses: ./.github/actions/test_analyze_project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/mypy-errors
-      - name: Error if the previous step didn't fail
-        if: steps.mypy-errors.outcome != 'failure'
-        run: |
-          echo "::error title=Test Failure::The previous step did not fail as expected."
-          exit 1
+          expect-failure: 'true'
 
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a

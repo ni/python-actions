@@ -1,0 +1,34 @@
+name: Test Analyze Project
+description: Test the analyze-project action with configurable project directory and failure expectations
+
+inputs:
+  project-directory:
+    description: Path to the directory containing pyproject.toml
+    required: true
+    type: string
+  expect-failure:
+    description: Whether the analyze-project step is expected to fail
+    required: false
+    default: 'false'
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Analyze project
+      uses: ../../analyze-project
+      id: analyze-project
+      continue-on-error: ${{ inputs.expect-failure == 'true' }}
+      with:
+        project-directory: ${{ inputs.project-directory }}
+    - name: Check expected outcome
+      run: |
+        if [[ "${{ inputs.expect-failure }}" == "true" ]]; then
+          if [[ "${{ steps.analyze-project.outcome }}" != "failure" ]]; then
+            echo "::error title=Test Failure::Expected analyze-project to fail, but it succeeded."
+            exit 1
+          else
+            echo "::notice title=Test Success::analyze-project failed as expected."
+          fi
+        fi
+      shell: bash
