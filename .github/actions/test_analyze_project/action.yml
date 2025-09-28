@@ -16,7 +16,7 @@ runs:
   using: composite
   steps:
     - name: Analyze project
-      uses: ni/python-actions/analyze-project@v0
+      uses: ni/python-actions/analyze-project@${{ github.sha }}
       id: analyze-project
       continue-on-error: ${{ inputs.expect-failure == 'true' }}
       with:

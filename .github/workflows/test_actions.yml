@@ -228,21 +228,21 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         uses: ./setup-poetry
-      - name: Analyze Valid Minimal
+      - name: Analyze valid minimal project
         uses: ./.github/actions/test_analyze_project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
-      - name: Analyze ni-python-styleguide Errors Project
+      - name: Analyze ni-python-styleguide-errors project
         uses: ./.github/actions/test_analyze_project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/ni-python-styleguide-errors
           expect-failure: 'true'
-      - name: Analyze mypy-errors Project
+      - name: Analyze mypy-errors project
         uses: ./.github/actions/test_analyze_project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/mypy-errors
           expect-failure: 'true'
-      - name: Analyze pyright-errors Project
+      - name: Analyze pyright-errors project
         uses: ./.github/actions/test_analyze_project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/pyright-errors
