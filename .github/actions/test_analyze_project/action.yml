@@ -19,6 +19,7 @@ runs:
       run: |
         echo "project-directory: ${{ inputs.project-directory }}"
         echo "expect-failure: ${{ inputs.expect-failure }}"
+        echo "continue-on-error??: ${{ inputs.expect-failure == 'true' }}"
       shell: bash
     - name: Analyze project
       uses: ni/python-actions/analyze-project@36f9be52791272a313ccda38ac90742941770e6c
@@ -28,12 +29,16 @@ runs:
         project-directory: ${{ inputs.project-directory }}
     - name: Check expected outcome
       run: |
+        echo "Beginning check expected outcome"
         if [[ "${{ inputs.expect-failure }}" == "true" ]]; then
+          echo "Expecting failures"
           if [[ "${{ steps.analyze-project.outcome }}" != "failure" ]]; then
             echo "::error title=Test Failure::Expected analyze-project to fail, but it succeeded."
             exit 1
           else
             echo "::notice title=Test Success::analyze-project failed as expected."
           fi
+        else
+          echo "Not expecting failures"
         fi
       shell: bash
