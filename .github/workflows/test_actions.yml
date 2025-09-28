@@ -237,10 +237,15 @@ jobs:
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/ni-python-styleguide-errors
           expect-failure: 'true'
-      - name: Analyze mypy Errors Project
+      - name: Analyze mypy-errors Project
         uses: ./.github/actions/test_analyze_project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/mypy-errors
+          expect-failure: 'true'
+      - name: Analyze pyright-errors Project
+        uses: ./.github/actions/test_analyze_project
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/pyright-errors
           expect-failure: 'true'
 
   # This job is intended to combine the test results so we don't have to list
