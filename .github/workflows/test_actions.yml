@@ -264,7 +264,6 @@ jobs:
           step-outcome: ${{ steps.analyze-pyright-errors.outcome }}
       - name: Analyze only-ni-python-styleguide project
         uses: ./analyze-project
-        continue-on-error: true
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
 
