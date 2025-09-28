@@ -228,7 +228,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         uses: ./setup-poetry
-      - name: Analyze Python Project
+      - name: Analyze minimal valid project
         uses: ./analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
@@ -262,6 +262,11 @@ jobs:
         uses: ./.github/actions/verify_expected_failure
         with:
           step-outcome: ${{ steps.analyze-pyright-errors.outcome }}
+      - name: Analyze only-ni-python-styleguide project
+        uses: ./analyze-project
+        continue-on-error: true
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
 
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a
