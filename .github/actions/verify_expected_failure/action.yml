@@ -1,0 +1,20 @@
+name: Verify expected failure
+description: Verify the the step-outcome is a 'failure'
+
+inputs:
+  step-outcome:
+    description: The outcome of the step to verify
+    required: true
+    type: string
+runs:
+  using: composite
+  steps:
+    - name: Verify outcome is 'failure'
+      run: |
+        if [[ "${{ inputs.step-outcome }}" != "failure" ]]; then
+          echo "::error title=Test Failure::Expected previous step to fail, but it succeeded."
+          exit 1
+        else
+          echo "::notice title=Test Success::Previous step failed as expected."
+        fi
+      shell: bash

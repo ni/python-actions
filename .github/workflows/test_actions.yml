@@ -228,25 +228,40 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         uses: ./setup-poetry
-      - name: Analyze valid minimal project
-        uses: ./.github/actions/test_analyze_project
+      - name: Analyze Python Project
+        uses: ./analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
       - name: Analyze ni-python-styleguide-errors project
-        uses: ./.github/actions/test_analyze_project
+        uses: ./analyze-project
+        id: analyze-ni-python-styleguide-errors
+        continue-on-error: true
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/ni-python-styleguide-errors
-          expect-failure: 'true'
+      - name: Verify expected failure
+        uses: ./.github/actions/verify_expected_failure
+        with:
+          step-outcome: ${{ steps.analyze-ni-python-styleguide-errors.outcome }}
       - name: Analyze mypy-errors project
-        uses: ./.github/actions/test_analyze_project
+        uses: ./analyze-project
+        id: analyze-mypy-errors
+        continue-on-error: true
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/mypy-errors
-          expect-failure: 'true'
+      - name: Verify expected failure
+        uses: ./.github/actions/verify_expected_failure
+        with:
+          step-outcome: ${{ steps.analyze-mypy-errors.outcome }}
       - name: Analyze pyright-errors project
-        uses: ./.github/actions/test_analyze_project
+        uses: ./analyze-project
+        id: analyze-pyright-errors
+        continue-on-error: true
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/pyright-errors
-          expect-failure: 'true'
+      - name: Verify expected failure
+        uses: ./.github/actions/verify_expected_failure
+        with:
+          step-outcome: ${{ steps.analyze-pyright-errors.outcome }}
 
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a
