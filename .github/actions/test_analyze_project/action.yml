@@ -23,7 +23,7 @@ runs:
       shell: bash
     - name: Analyze project
       uses: ni/python-actions/analyze-project@36f9be52791272a313ccda38ac90742941770e6c
-      id: analyze-project
+      id: analyze-project-subaction
       continue-on-error: ${{ inputs.expect-failure == 'true' }}
       with:
         project-directory: ${{ inputs.project-directory }}
@@ -32,7 +32,7 @@ runs:
         echo "Beginning check expected outcome"
         if [[ "${{ inputs.expect-failure }}" == "true" ]]; then
           echo "Expecting failures"
-          if [[ "${{ steps.analyze-project.outcome }}" != "failure" ]]; then
+          if [[ "${{ steps.analyze-project-subaction.outcome }}" != "failure" ]]; then
             echo "::error title=Test Failure::Expected analyze-project to fail, but it succeeded."
             exit 1
           else
