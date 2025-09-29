@@ -271,7 +271,7 @@ jobs:
           project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
 
   test_analyze_project_cache_hit:
-    name: Test analyze-project
+    name: Test analyze-project (cache hit)
     needs: test_analyze_project
     runs-on: ${{ matrix.os }}
     strategy:

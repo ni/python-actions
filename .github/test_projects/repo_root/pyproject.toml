@@ -18,7 +18,7 @@ mypy = ">=1.0"
 pyright = { version = ">=1.1.400", extras = ["nodejs"] }
 
 [tool.ni-python-styleguide]
-extend_exclude = "update-project-version"
+extend_exclude = "update-project-version,.github"
 
 [tool.mypy]
 mypy_path = "."
