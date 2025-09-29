@@ -270,6 +270,65 @@ jobs:
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
 
+  test_analyze_project_cache_hit:
+    name: Test analyze-project
+    needs: test_analyze_project
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Set up Python
+        uses: ./setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Poetry
+        uses: ./setup-poetry
+      - name: Analyze minimal valid project
+        uses: ./analyze-project
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/minimal
+      - name: Analyze ni-python-styleguide-errors project
+        uses: ./analyze-project
+        id: analyze-ni-python-styleguide-errors
+        continue-on-error: true
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/ni-python-styleguide-errors
+      - name: Error if the previous step didn't fail
+        if: steps.analyze-ni-python-styleguide-errors.outcome != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1          
+      - name: Analyze mypy-errors project
+        uses: ./analyze-project
+        id: analyze-mypy-errors
+        continue-on-error: true
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/mypy-errors
+      - name: Error if the previous step didn't fail
+        if: steps.analyze-mypy-errors.outcome != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1          
+      - name: Analyze pyright-errors project
+        uses: ./analyze-project
+        id: analyze-pyright-errors
+        continue-on-error: true
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/pyright-errors
+      - name: Error if the previous step didn't fail
+        if: steps.analyze-pyright-errors.outcome != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1          
+      - name: Analyze only-ni-python-styleguide project
+        uses: ./analyze-project
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
+
   test_analyze_project_repo_root:
     name: Test analyze-project (repo root)
     runs-on: ${{ matrix.os }}
