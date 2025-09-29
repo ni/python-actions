@@ -59,7 +59,6 @@ runs:
     - name: Check for mypy and pyright installation
       id: check_tools
       run: |
-        poetry run python - <<EOF
         import os
         from importlib.metadata import version, PackageNotFoundError
 
@@ -73,9 +72,8 @@ runs:
         with open(os.environ["GITHUB_OUTPUT"], "a") as output:
             print(f"mypy={is_installed('mypy')}", file=output)
             print(f"pyright={is_installed('pyright')}", file=output)
-        EOF
       working-directory: ${{ inputs.project-directory }}
-      shell: bash
+      shell: poetry run python {0}
     - name: Echo check_tools outputs
       run: |
         echo "mypy installed: ${{ steps.check_tools.outputs.mypy }}"
@@ -94,7 +92,7 @@ runs:
       working-directory: ${{ inputs.project-directory }}
     - name: Pyright static analysis
       if: steps.check_tools.outputs.pyright == 'true'
-      uses: jakebailey/pyright-action@b5d50e5cde6547546a5c4ac92e416a8c2c1a1dfe # v2.3.2
+      uses: jakebailey/pyright-action@6cabc0f01c4994be48fd45cd9dbacdd6e1ee6e5e # v2.3.3
       with:
         version: PATH
         working-directory: ${{ inputs.project-directory }}

@@ -27,20 +27,30 @@ runs:
     - name: Set paths (Linux/Mac)
       if: runner.os != 'Windows'
       run: |
-        echo "POETRY_BIN_DIR=$GITHUB_WORKSPACE/.cache/poetry/bin" >> "$GITHUB_ENV"
-        echo "POETRY_CONFIG_DIR=$GITHUB_WORKSPACE/.cache/poetry/config" >> "$GITHUB_ENV"
-        echo "POETRY_HOME=$GITHUB_WORKSPACE/.cache/poetry/home" >> "$GITHUB_ENV"
-        echo "POETRY_HOME_BIN=$GITHUB_WORKSPACE/.cache/poetry/home/bin" >> "$GITHUB_ENV"
-        echo "$GITHUB_WORKSPACE/.cache/poetry/bin" >> "$GITHUB_PATH"
+        # Use the "pipeline directory" so that tools that search the workspace
+        # directory for Python files will not find the Poetry cache. Use
+        # realpath to normalize the "../".
+        PIPELINE_DIR="$(realpath $GITHUB_WORKSPACE/..)"
+        POETRY_ROOT="$PIPELINE_DIR/.cache/poetry"
+        echo "POETRY_BIN_DIR=$POETRY_ROOT/bin" >> "$GITHUB_ENV"
+        echo "POETRY_CONFIG_DIR=$POETRY_ROOT/config" >> "$GITHUB_ENV"
+        echo "POETRY_HOME=$POETRY_ROOT/home" >> "$GITHUB_ENV"
+        echo "POETRY_HOME_BIN=$POETRY_ROOT/home/bin" >> "$GITHUB_ENV"
+        echo "$POETRY_ROOT/bin" >> "$GITHUB_PATH"
       shell: bash
     - name: Set paths (Windows)
       if: runner.os == 'Windows'
       run: |
-        Add-Content $env:GITHUB_ENV "POETRY_BIN_DIR=$env:GITHUB_WORKSPACE\.cache\poetry\bin"
-        Add-Content $env:GITHUB_ENV "POETRY_CONFIG_DIR=$env:GITHUB_WORKSPACE\.cache\poetry\config"
-        Add-Content $env:GITHUB_ENV "POETRY_HOME=$env:GITHUB_WORKSPACE\.cache\poetry\home"
-        Add-Content $env:GITHUB_ENV "POETRY_HOME_BIN=$env:GITHUB_WORKSPACE\.cache\poetry\home\Scripts"
-        Add-Content $env:GITHUB_PATH "$env:GITHUB_WORKSPACE\.cache\poetry\bin"
+        # Use the "pipeline directory" so that tools that search the workspace
+        # directory for Python files will not find the Poetry cache. Use
+        # Resolve-Path to normalize the "../".
+        $PIPELINE_DIR = (Resolve-Path -Path "$env:GITHUB_WORKSPACE\..").Path
+        $POETRY_ROOT = "$PIPELINE_DIR\.cache\poetry"
+        Add-Content $env:GITHUB_ENV "POETRY_BIN_DIR=$POETRY_ROOT\bin"
+        Add-Content $env:GITHUB_ENV "POETRY_CONFIG_DIR=$POETRY_ROOT\config"
+        Add-Content $env:GITHUB_ENV "POETRY_HOME=$POETRY_ROOT\home"
+        Add-Content $env:GITHUB_ENV "POETRY_HOME_BIN=$POETRY_ROOT\home\Scripts"
+        Add-Content $env:GITHUB_PATH "$POETRY_ROOT\bin"
       shell: pwsh
     - name: Copy paths from $GITHUB_ENV to $GITHUB_OUTPUT
       id: copy-paths
