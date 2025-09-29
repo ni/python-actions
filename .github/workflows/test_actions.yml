@@ -269,6 +269,57 @@ jobs:
         uses: ./analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
+      - name: Analyze extras-and-dependency-groups project
+        uses: ./analyze-project
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
+          extras: "colors serialization"
+          dependency-groups: "dev,docs,utils"
+      - name: Check for expected dependencies
+        run: |
+          echo "Checking for expected packages from extras and dependency groups..."
+          pip_list=$(poetry run pip list)
+          echo "Installed packages:"
+          echo "$pip_list"
+          
+          # Check for base dependencies
+          if ! echo "$pip_list" | grep -i "ni-python-styleguide"; then
+            echo "::error title=Test Failure::ni-python-styleguide not found in pip list"
+            exit 1
+          fi
+          if ! echo "$pip_list" | grep -i "requests"; then
+            echo "::error title=Test Failure::requests not found in pip list"
+            exit 1
+          fi
+          
+          # Check for extras packages
+          if ! echo "$pip_list" | grep -i "colorama"; then
+            echo "::error title=Test Failure::colorama (from colors extra) not found in pip list"
+            exit 1
+          fi
+          if ! echo "$pip_list" | grep -i "tomli"; then
+            echo "::error title=Test Failure::tomli (from serialization extra) not found in pip list"
+            exit 1
+          fi
+          
+          # Check for dependency group packages
+          if ! echo "$pip_list" | grep -i "pytest"; then
+            echo "::error title=Test Failure::pytest (from dev group) not found in pip list"
+            exit 1
+          fi
+          if ! echo "$pip_list" | grep -i "markdown"; then
+            echo "::error title=Test Failure::markdown (from docs group) not found in pip list"
+            exit 1
+          fi
+          if ! echo "$pip_list" | grep -i "click"; then
+            echo "::error title=Test Failure::click (from utils group) not found in pip list"
+            exit 1
+          fi
+          
+          echo "✅ All expected packages found!"
+        working-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
+        shell: bash
+
 
   test_analyze_project_cache_hit:
     name: Test analyze-project (cache hit)

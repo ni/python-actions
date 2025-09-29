@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "extras-and-dependency-groups"
+version = "0.1.0"
+description = "Tests actions/analyze-project with a project that has extras and dependency groups"
+authors = ["Joel Dixon <joel.dixon@ni.com>"]
+readme = "README.md"
+packages = [{include = "test_project", from = "src"}]
+
+[tool.poetry.dependencies]
+ni-python-styleguide = ">=0.4.7"
+python = "^3.9"
+# Using a simple, publicly available package instead
+requests = "^2.28.0"
+
+[tool.poetry.extras]
+# Small utility packages for testing extras
+colors = ["colorama"]
+serialization = ["tomli"]
+
+[tool.poetry.group.dev.dependencies]
+# Small packages for testing dependency groups
+pytest = "^7.0.0"
+
+[tool.poetry.group.docs.dependencies]
+# Small documentation-related packages
+markdown = "^3.4.0"
+
+[tool.poetry.group.utils.dependencies]
+# Small utility packages
+click = "^8.0.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
