@@ -238,30 +238,33 @@ jobs:
         continue-on-error: true
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/ni-python-styleguide-errors
-      - name: Verify expected failure
-        uses: ./.github/actions/verify_expected_failure
-        with:
-          step-outcome: ${{ steps.analyze-ni-python-styleguide-errors.outcome }}
+      - name: Error if the previous step didn't fail
+        if: steps.analyze-ni-python-styleguide-errors.outcome != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1          
       - name: Analyze mypy-errors project
         uses: ./analyze-project
         id: analyze-mypy-errors
         continue-on-error: true
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/mypy-errors
-      - name: Verify expected failure
-        uses: ./.github/actions/verify_expected_failure
-        with:
-          step-outcome: ${{ steps.analyze-mypy-errors.outcome }}
+      - name: Error if the previous step didn't fail
+        if: steps.analyze-mypy-errors.outcome != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1          
       - name: Analyze pyright-errors project
         uses: ./analyze-project
         id: analyze-pyright-errors
         continue-on-error: true
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/pyright-errors
-      - name: Verify expected failure
-        uses: ./.github/actions/verify_expected_failure
-        with:
-          step-outcome: ${{ steps.analyze-pyright-errors.outcome }}
+      - name: Error if the previous step didn't fail
+        if: steps.analyze-pyright-errors.outcome != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1          
       - name: Analyze only-ni-python-styleguide project
         uses: ./analyze-project
         with:
