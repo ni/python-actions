@@ -216,6 +216,7 @@ jobs:
     name: Test analyze-project
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false # If there are failures, sometimes it is instructive to see which combinations passed
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
@@ -273,7 +274,7 @@ jobs:
         uses: ./analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
-          install-args: "--extras 'colors serialization' --with dev,docs,utils"
+          install-args: "--extras colors serialization --with dev,docs,utils"
       - name: Check for expected dependencies
         run: |
           echo "Checking for expected packages from extras and dependency groups..."
