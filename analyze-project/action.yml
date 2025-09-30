@@ -9,15 +9,9 @@ inputs:
   project-directory:
     description: Path to the directory containing pyproject.toml.
     default: ${{ github.workspace }}
-  extras:
-    # E.g. "docs drivers"
-    description: 'List of Poetry extras to install (separated by spaces)'
-    default: ''
-    required: false
-    type: string
-  dependency-groups:
-    # E.g. "examples,docs"
-    description: 'List of Poetry dependency groups to install (separated by commas)'
+  install-args:
+    # E.g. "--extras 'drivers addons' --with examples,docs"
+    description: 'Extra arguments. Install command will be "poetry install <install-args>".'
     default: ''
     required: false
     type: string
@@ -52,12 +46,7 @@ runs:
     - name: Install ${{ steps.get_project_info.outputs.name }}
       run: |
         install_cmd="poetry install -v"
-        if [ -n "${{ inputs.extras }}" ]; then
-          install_cmd="$install_cmd --extras '${{ inputs.extras }}'"
-        fi
-        if [ -n "${{ inputs.dependency-groups }}" ]; then
-          install_cmd="$install_cmd --with ${{ inputs.dependency-groups }}"
-        fi
+        install_cmd="$install_cmd --extras '${{ inputs.install-args }}'"
         eval $install_cmd
       working-directory: ${{ inputs.project-directory }}
       shell: bash
