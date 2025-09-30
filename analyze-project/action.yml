@@ -52,7 +52,7 @@ runs:
     - name: Install ${{ steps.get_project_info.outputs.name }}
       run: |
         install_cmd="poetry install -v"
-        install_cmd="$install_cmd --extras '${{ inputs.install-args }}'"
+        install_cmd="$install_cmd ${{ inputs.install-args }}"
         eval $install_cmd
       working-directory: ${{ inputs.project-directory }}
       shell: bash
