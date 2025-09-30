@@ -273,7 +273,7 @@ jobs:
         uses: ./analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
-          install-args: "--extras colors serialization --with dev,docs,utils"
+          install-args: "--extras 'colors serialization' --with dev,docs,utils"
       - name: Check for expected dependencies
         run: |
           echo "Checking for expected packages from extras and dependency groups..."
