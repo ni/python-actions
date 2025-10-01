@@ -74,8 +74,8 @@ Here are the steps to follow to publish the package:
   ```
 
 > [!NOTE]
-> This GitHub project has immutable releases enabled. Once you create a release, you can only edit
-> the title and description. You cannot delete the full release tag (e.g. `v0.1.2`).
+> This GitHub project has immutable releases enabled. Once you publish a release, you can only edit
+> the title and description. You cannot modify the full release tag (e.g. `v0.1.2`).
 
 ## Developer Certificate of Origin (DCO)
 
