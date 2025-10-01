@@ -34,14 +34,17 @@ file associated with the Python project you are analyzing.
     project-directory: ${{ github.workspace }}/packages/myproject
 ```
 
-### `extras`
+### `install-args`
 
-If there are extras you need to install from your pyproject.toml, specify a space-separated list
-of extra groups to install. For example, 
+If there are extra command-line arguments you need to install from your
+pyproject.toml, specify them with this input. You can specify any arguments that
+work with `poetry install` including `--extras` and `--with`. These
+`install-args` will be appended to the basic command line which is `poetry
+install -v`. For example,
 
 ```yaml
 - uses: ni/python-actions/analyze-project@v0
   with:
     project-directory: ${{ github.workspace }}/packages/myproject
-    extras: 'docs drivers'
+    install-args: "--extras 'colors serialization' --with dev,docs,utils"
 ```

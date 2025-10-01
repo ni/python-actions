@@ -306,7 +306,7 @@ jobs:
             exit 1
           fi
 
-          echo "✅ All expected packages found!"
+          echo "All expected packages found!"
         working-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
         shell: bash
 

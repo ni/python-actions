@@ -51,8 +51,7 @@ runs:
         key: ${{ steps.get_project_info.outputs.name }}-${{ runner.os }}-py${{ env.pythonVersion }}-${{ hashFiles(format('{0}/poetry.lock', inputs.project-directory)) }}-${{ steps.install_args_hash.outputs.hash }}
     - name: Install ${{ steps.get_project_info.outputs.name }}
       run: |
-        install_cmd="poetry install -v"
-        install_cmd="$install_cmd ${{ inputs.install-args }}"
+        install_cmd="poetry install -v ${{ inputs.install-args }}"
         eval $install_cmd
       working-directory: ${{ inputs.project-directory }}
       shell: bash
