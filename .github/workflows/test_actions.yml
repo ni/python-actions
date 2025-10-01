@@ -216,6 +216,7 @@ jobs:
     name: Test analyze-project
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false # If there are failures, sometimes it is instructive to see which combinations passed
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
@@ -269,6 +270,46 @@ jobs:
         uses: ./analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
+      - name: Analyze extras-and-dependency-groups project
+        uses: ./analyze-project
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
+          install-args: "--extras 'colors serialization' --with dev,docs,utils"
+      - name: Check for expected dependencies
+        run: |
+          echo "Checking for expected packages from extras and dependency groups..."
+          pip_list=$(poetry run pip list)
+          echo "Installed packages:"
+          echo "$pip_list"
+
+          # Check for extras packages
+          if ! echo "$pip_list" | grep -i "colorama"; then
+            echo "::error title=Test Failure::colorama (from colors extra) not found in pip list"
+            exit 1
+          fi
+          if ! echo "$pip_list" | grep -i "tomli"; then
+            echo "::error title=Test Failure::tomli (from serialization extra) not found in pip list"
+            exit 1
+          fi
+
+          # Check for dependency group packages
+          if ! echo "$pip_list" | grep -i "pytest"; then
+            echo "::error title=Test Failure::pytest (from dev group) not found in pip list"
+            exit 1
+          fi
+          if ! echo "$pip_list" | grep -i "markdown"; then
+            echo "::error title=Test Failure::markdown (from docs group) not found in pip list"
+            exit 1
+          fi
+          if ! echo "$pip_list" | grep -i "click"; then
+            echo "::error title=Test Failure::click (from utils group) not found in pip list"
+            exit 1
+          fi
+
+          echo "All expected packages found!"
+        working-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
+        shell: bash
+
 
   test_analyze_project_cache_hit:
     name: Test analyze-project (cache hit)
