@@ -1,4 +1,4 @@
-# Contributing to `ni/python-actions` 
+# Contributing to `ni/python-actions`
 
 Contributions to `ni/python-actions` are welcome from all!
 
@@ -19,15 +19,65 @@ this repository.
 
 See [GitHub's official documentation](https://help.github.com/articles/using-pull-requests/) for more details.
 
-# Getting Started
+## Getting Started
 
-- TODO: include build steps here.
+To contribute to this project, it is recommended that you follow these steps:
 
-# Testing
+- Fork the repository on GitHub.
+- Run the PR workflow on your fork of the repository. At this point, if any tests fail, do not begin
+  development. Try to investigate these failures. If you're unable to do so, report an issue through
+  our GitHub issues page.
+- Write new tests that demonstrate your bug or feature. Ensure that these new tests fail.
+- Make your change.
+- Run all the regression tests again (including the tests you just added), and confirm that they all
+  pass.
+- Send a GitHub Pull Request to the main repository's `main` branch. GitHub Pull Requests are the
+  expected method of code collaboration on this project.
 
-- TODO: include testing steps here.
+## Testing
 
-# Developer Certificate of Origin (DCO)
+To run the `ni/python-actions` regression tests, run the following command:
+
+```bash
+gh workflow run PR.yml --ref users/me/my-dev-branch
+```
+
+View the workflow status and logs using the GitHub web UI.
+
+## Publishing a Release
+
+Maintainers can publish `ni/python-actions` by creating a GitHub release in the `ni/python-actions` repo.
+Here are the steps to follow to publish the package:
+
+- From the main GitHub repo page, select "Create a new release".
+- On the "New Release" page, create a new tag using the "Select Tag" drop down. The tag must be the
+  letter 'v' followed the version number. Example: v0.1.2.
+- Enter a title in the "Release title" field. The title should contain the repo name and version
+  tag. For example: ni/python-actions v0.1.2.
+- Click "Generate release notes" and edit the release notes.
+- Delete entries for PRs that do not affect users, such as "chore(deps):" and "fix(deps):" PRs.
+  However, consider including significant dependency updates, such as major version updates.
+- Consider grouping related entries.
+- Reformat entries to be more readable. For example, change "Blah blah by so-and-so in \#123" to
+  "Blah blah (\#123)".
+- If this is a pre-release release, check the "Set as a pre-release" checkbox.
+- Click "Publish release".
+- This repository does not have a publish workflow yet, so you must manually update the `v{major}`
+  and `v{major}.{minor}` tags:
+
+  ```bash
+  git checkout v0.1.2
+  git tag -f v0.1
+  git tag -f v0
+  git push -f origin v0.1
+  git push -f origin v0
+  ```
+
+> [!NOTE]
+> This GitHub project has immutable releases enabled. Once you publish a release, you can only edit
+> the title and description. You cannot modify the full release tag (e.g. `v0.1.2`).
+
+## Developer Certificate of Origin (DCO)
 
    Developer's Certificate of Origin 1.1
 
