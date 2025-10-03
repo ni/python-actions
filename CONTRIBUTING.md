@@ -46,7 +46,7 @@ View the workflow status and logs using the GitHub web UI.
 
 ## Publishing a Release
 
-You can publish `ni/python-actions` by creating a GitHub release in the `ni/python-actions` repo.
+Maintainers can publish `ni/python-actions` by creating a GitHub release in the `ni/python-actions` repo.
 Here are the steps to follow to publish the package:
 
 - From the main GitHub repo page, select "Create a new release".
