@@ -34,7 +34,7 @@ jobs:
               print(f"::error title=Test Failure::The Python implementation does not match. Got {implementation}, expected {expected_implementation}.")
               sys.exit(1)
           threading = "free-threading" if sysconfig.get_config_var("Py_GIL_DISABLED") else "GIL"
-          expected_threading = "free-threading" if "${{ matrix.python-version }}".endswith("t") else "GIL"
+          expected_threading = "free-threading" if "t" in "${{ matrix.python-version }}" else "GIL"
           if threading != expected_threading:
               print(f"::error title=Test Failure::The Python threading does not match. Got {threading}, expected {expected_threading}.")
               sys.exit(1)
