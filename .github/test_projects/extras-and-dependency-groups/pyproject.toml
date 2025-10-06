@@ -21,7 +21,7 @@ serialization = ["tomli"]
 
 [tool.poetry.group.dev.dependencies]
 # Small packages for testing dependency groups
-pytest = "^7.0.0"
+pytest = "^8.0.0"
 
 [tool.poetry.group.docs.dependencies]
 # Small documentation-related packages
