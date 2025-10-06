@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.13t, pypy3.10, pypy3.11]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.13t, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -21,9 +21,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Check Python version
         run: |
-          import sys, sysconfig
-          version = sys.version_info[:2]
-          expected_version = tuple(map(int, "${{ matrix.python-version }}".removeprefix("pypy").removesuffix("t").split(".")))
+          import sys, sysconfig, re
+          match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", "${{ matrix.python-version }}")
+          expected_version = tuple(int(g) for g in match.groups() if g is not None)
+          version = sys.version_info[:len(expected_version)]
           if version != expected_version:
               print(f"::error title=Test Failure::The Python version does not match. Got {version}, expected {expected_version}.")
               sys.exit(1)
@@ -33,7 +34,7 @@ jobs:
               print(f"::error title=Test Failure::The Python implementation does not match. Got {implementation}, expected {expected_implementation}.")
               sys.exit(1)
           threading = "free-threading" if sysconfig.get_config_var("Py_GIL_DISABLED") else "GIL"
-          expected_threading = "free-threading" if "${{ matrix.python-version }}".endswith("t") else "GIL"
+          expected_threading = "free-threading" if "t" in "${{ matrix.python-version }}" else "GIL"
           if threading != expected_threading:
               print(f"::error title=Test Failure::The Python threading does not match. Got {threading}, expected {expected_threading}.")
               sys.exit(1)
@@ -45,7 +46,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -72,7 +73,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -104,7 +105,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -219,7 +220,7 @@ jobs:
       fail-fast: false # If there are failures, sometimes it is instructive to see which combinations passed
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -318,7 +319,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -376,7 +377,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, pypy3.10, pypy3.11]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
