@@ -9,10 +9,10 @@ packages = [{include = "test_project", from = "src"}]
 [tool.poetry.dependencies]
 ni-python-styleguide = ">=0.4.7"
 python = "^3.9"
-requests = "^2.28.0"
+requests = ">=2.28.0"
 # Optional dependencies for extras
-colorama = {version = "^0.4.0", optional = true}
-tomli = {version = "^2.0.0", optional = true}
+colorama = {version = ">=0.4.0", optional = true}
+tomli = {version = ">=2.0.0", optional = true}
 
 [tool.poetry.extras]
 # Small utility packages for testing extras
@@ -21,15 +21,15 @@ serialization = ["tomli"]
 
 [tool.poetry.group.dev.dependencies]
 # Small packages for testing dependency groups
-pytest = "^8.0.0"
+pytest = ">=8.0.0"
 
 [tool.poetry.group.docs.dependencies]
 # Small documentation-related packages
-markdown = "^3.4.0"
+markdown = ">=3.4.0"
 
 [tool.poetry.group.utils.dependencies]
 # Small utility packages
-click = "^8.0.0"
+click = ">=8.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
