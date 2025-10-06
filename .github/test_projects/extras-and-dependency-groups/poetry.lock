@@ -791,4 +791,4 @@ serialization = ["tomli"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "9e7c6a1ddb143f5e1271347ffb37e7ba67bfd60576b002166ad6193c9393ce27"
+content-hash = "1e1f5798757cfbe6c135771b710c9e4d0306b96a1d4f10db3062a6871cf76a00"
