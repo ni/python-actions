@@ -14,7 +14,7 @@ packages = [{include = "test_project", from = "src"}]
 
 [tool.poetry.group.lint.dependencies]
 ni-python-styleguide = ">=0.4.1"
-mypy = ">=1.0"
+mypy = { version = ">=1.0", markers = "implementation_name != 'pypy'" }
 pyright = { version = ">=1.1.400", extras = ["nodejs"] }
 
 [tool.ni-python-styleguide]
