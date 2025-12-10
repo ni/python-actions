@@ -76,7 +76,7 @@ runs:
     shell: python
   - name: Create pull request
     if: inputs.create-pull-request == 'true'
-    uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+    uses: peter-evans/create-pull-request@84ae59a2cdc2258d6fa0732dd66352dddae2a412 # v7.0.9
     env:
       action-url: https://github.com/${{ github.action_repository }}/tree/${{ github.action_ref }}/update-project-version
     with:
