@@ -14,7 +14,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.13t, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -49,7 +49,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -76,7 +76,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -108,7 +108,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -137,7 +137,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
       - name: Set up Poetry
@@ -171,7 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
       - name: Set up Poetry
@@ -223,7 +223,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -322,7 +322,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
         with:
@@ -380,7 +380,7 @@ jobs:
         python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14.0-rc.3, 3.14t-dev, pypy3.10, pypy3.11]
     steps:
       - name: Check out repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
         uses: ./setup-python
         with:
