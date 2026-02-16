@@ -45,7 +45,7 @@ runs:
         echo "hash=$install_args_hash" >> "$GITHUB_OUTPUT"
       shell: bash
     - name: Cache virtualenv
-      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+      uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: ${{ steps.get_project_info.outputs.venv-path }}
         key: ${{ steps.get_project_info.outputs.name }}-${{ runner.os }}-py${{ env.pythonVersion }}-${{ hashFiles(format('{0}/poetry.lock', inputs.project-directory)) }}-${{ steps.install_args_hash.outputs.hash }}
