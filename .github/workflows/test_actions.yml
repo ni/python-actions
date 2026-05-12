@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         # pypy3.11-7.3.20 is a workaround for https://github.com/pypy/pypy/issues/5388 - Regression in 7.3.21: OpenSSL prints verbosely
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.13t, 3.14, 3.14t, pypy3.10, pypy3.11-7.3.20]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.13t, 3.14, 3.14t, pypy3.11-7.3.20]
     steps:
       - name: Check out repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.10, pypy3.11-7.3.20]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
     steps:
       - name: Check out repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -74,7 +74,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.10, pypy3.11-7.3.20]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
     steps:
       - name: Check out repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -106,7 +106,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.10, pypy3.11-7.3.20]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
     steps:
       - name: Check out repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -221,7 +221,7 @@ jobs:
       fail-fast: false # If there are failures, sometimes it is instructive to see which combinations passed
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.10, pypy3.11-7.3.20]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
     steps:
       - name: Check out repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -320,7 +320,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.10, pypy3.11-7.3.20]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
     steps:
       - name: Check out repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -378,7 +378,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.10, pypy3.11-7.3.20]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
     steps:
       - name: Check out repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
