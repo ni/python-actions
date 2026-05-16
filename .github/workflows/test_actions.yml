@@ -17,6 +17,7 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Python
+        id: setup-python
         uses: ./setup-python
         with:
           python-version: ${{ matrix.python-version }}
@@ -25,7 +26,7 @@ jobs:
           import sys, sysconfig, re, os
 
           matrix_python_version = "${{ matrix.python-version }}"
-          env_python_version = os.environ["pythonVersion"]
+          output_python_version = "${{ steps.setup-python.outputs.python-version }}"
 
           match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", matrix_python_version)
           expected_version = tuple(int(g) for g in match.groups() if g is not None)
@@ -33,10 +34,10 @@ jobs:
           if version != expected_version:
               print(f"::error title=Test Failure::The Python version does not match. Got {version}, expected {expected_version}.")
               sys.exit(1)
-          match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", env_python_version)
-          env_version = tuple(int(g) for g in match.groups() if g is not None)[:len(expected_version)]
-          if env_version != expected_version:
-              print(f"::error title=Test Failure::The env.pythonVersion version does not match. Got {env_version}, expected {expected_version}.")
+          match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", output_python_version)
+          output_version = tuple(int(g) for g in match.groups() if g is not None)[:len(expected_version)]
+          if output_version != expected_version:
+              print(f"::error title=Test Failure::The outputs.python-version version does not match. Got {output_version}, expected {expected_version}.")
               sys.exit(1)
 
           implementation = sys.implementation.name
@@ -44,18 +45,23 @@ jobs:
           if implementation != expected_implementation:
               print(f"::error title=Test Failure::The Python implementation does not match. Got {implementation}, expected {expected_implementation}.")
               sys.exit(1)
-          env_implementation = "pypy" if env_python_version.startswith("pypy") else "cpython"
-          if env_implementation != expected_implementation:
-              print(f"::error title=Test Failure::The env.pythonVersion implementation does not match. Got {env_implementation}, expected {expected_implementation}.")
+          output_implementation = "pypy" if output_python_version.startswith("pypy") else "cpython"
+          if output_implementation != expected_implementation:
+              print(f"::error title=Test Failure::The outputs.python-version implementation does not match. Got {output_implementation}, expected {expected_implementation}.")
 
           threading = "free-threading" if sysconfig.get_config_var("Py_GIL_DISABLED") else "GIL"
           expected_threading = "free-threading" if "t" in matrix_python_version else "GIL"
           if threading != expected_threading:
               print(f"::error title=Test Failure::The Python threading does not match. Got {threading}, expected {expected_threading}.")
               sys.exit(1)
-          env_threading = "free-threading" if "t" in env_python_version else "GIL"
-          if env_threading != expected_threading:
-              print(f"::error title=Test Failure::The env.pythonVersion threading does not match. Got {env_threading}, expected {expected_threading}.")
+          output_threading = "free-threading" if "t" in output_python_version else "GIL"
+          if output_threading != expected_threading:
+              print(f"::error title=Test Failure::The outputs.python-version threading does not match. Got {output_threading}, expected {expected_threading}.")
+
+          env_python_version = os.environ["pythonVersion"]
+          if env_python_version != output_python_version:
+              print(f"::error title=Test Failure::env.pythonVersion does not match outputs.python-version. Got {env_python_version}, expected {output_python_version}.")
+              sys.exit(1)
         shell: python
 
   test_setup_poetry:
