@@ -13,33 +13,35 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Check project version
-    run: |
-      project_version="$(poetry version --short)"
-      expected_version="${{ inputs.expected-version }}"
-      # Strip the leading 'v', in case this is a GitHub release tag.
-      expected_version="${expected_version#v}"
+    - name: Check project version
+      run: |
+        project_version="$(poetry version --short)"
+        expected_version="$EXPECTED_VERSION"
+        # Strip the leading 'v', in case this is a GitHub release tag.
+        expected_version="${expected_version#v}"
 
-      error_message="$(cat <<EOF
-      The project version in pyproject.toml does not match the expected version.
-      
-      If this workflow was triggered by a GitHub release, verify that the
-      release was tagged with the correct version. If they don't match, you
-      should either update pyproject.toml or delete and re-create the release
-      with the correct tag.
+        error_message="$(cat <<EOF
+        The project version in pyproject.toml does not match the expected version.
+        
+        If this workflow was triggered by a GitHub release, verify that the
+        release was tagged with the correct version. If they don't match, you
+        should either update pyproject.toml or delete and re-create the release
+        with the correct tag.
 
-      Project version: $project_version
-      Expected version: $expected_version
-      EOF
-      )"
+        Project version: $project_version
+        Expected version: $expected_version
+        EOF
+        )"
 
-      # Convert newline to %0A so that GitHub includes the entire error message
-      # in the annotation.
-      error_message="$(echo "$error_message" | sed -z 's/\n/%0A/g;s/%0A$/\n/')"
+        # Convert newline to %0A so that GitHub includes the entire error message
+        # in the annotation.
+        error_message="$(echo "$error_message" | sed -z 's/\n/%0A/g;s/%0A$/\n/')"
 
-      if [ x"$project_version" != x"$expected_version" ]; then
-        echo "::error title=Project Version Error::$error_message"
-        exit 1
-      fi
-    shell: bash
-    working-directory: ${{ inputs.project-directory }}
+        if [ x"$project_version" != x"$expected_version" ]; then
+          echo "::error title=Project Version Error::$error_message"
+          exit 1
+        fi
+      shell: bash
+      working-directory: ${{ inputs.project-directory }}
+      env:
+        EXPECTED_VERSION: ${{ inputs.expected-version }}
