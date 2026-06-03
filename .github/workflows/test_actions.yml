@@ -29,8 +29,8 @@ jobs:
         run: |
           import sys, sysconfig, re, os
 
-          matrix_python_version = "${{ matrix.python-version }}"
-          output_python_version = "${{ steps.setup-python.outputs.python-version }}"
+          matrix_python_version = os.environ["MATRIX_PYTHON_VERSION"]
+          output_python_version = os.environ["OUTPUT_PYTHON_VERSION"]
 
           match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", matrix_python_version)
           expected_version = tuple(int(g) for g in match.groups() if g is not None)
@@ -67,6 +67,9 @@ jobs:
               print(f"::error title=Test Failure::env.pythonVersion does not match outputs.python-version. Got {env_python_version}, expected {output_python_version}.")
               sys.exit(1)
         shell: python
+        env:
+          MATRIX_PYTHON_VERSION: ${{ matrix.python-version }}
+          OUTPUT_PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
 
   test_setup_poetry:
     name: Test setup-poetry
