@@ -42,7 +42,9 @@ If there are extra command-line arguments you need to install from your
 pyproject.toml, specify them with this input. You can specify any arguments that
 work with `poetry install` including `--extras` and `--with`. These
 `install-args` will be appended to the basic command line which is `poetry
-install -v`. For example,
+install -v`. Do not pass untrusted user input.
+
+For example,
 
 ```yaml
 - uses: ni/python-actions/analyze-project@v0

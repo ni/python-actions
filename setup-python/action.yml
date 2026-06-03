@@ -17,5 +17,8 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
     - name: Add pythonVersion environment variable
-      run: echo "pythonVersion=${{ steps.setup-python.outputs.python-version }}" >> "$GITHUB_ENV"
+      run: | # zizmor: ignore[github-env] # value is queried from the installed Python interpreter, not user input
+        echo "pythonVersion=$PYTHON_VERSION" >> "$GITHUB_ENV"
       shell: bash
+      env:
+        PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}

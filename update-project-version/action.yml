@@ -30,73 +30,91 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Set variables
-    id: set-vars
-    run: |
-      # For release events, github.ref_name is the release tag (e.g. 1.0.0) and
-      # github.event.release.target_commitish is the branch/tag/commit that the
-      # tag was created from (e.g. main).
-      #
-      # For workflow_dispatch events, github.ref_name is the branch/tag/commit
-      # that the workflow was dispatched on.
-      base_branch="${{ github.event_name == 'release' && github.event.release.target_commitish || github.ref_name }}"
-      base_branch_no_slashes=$(echo $base_branch | tr '/' '-')
-      echo "base-branch=$base_branch" >> "$GITHUB_OUTPUT"
-      echo "branch-name=${{ inputs.branch-prefix }}update-project-version-$base_branch_no_slashes" >> "$GITHUB_OUTPUT"
-    shell: bash
-  - name: Update the version in pyproject.toml
-    run: python ${{ github.action_path }}/update_version.py ${{ inputs.version-rule }} ${{ inputs.use-dev-suffix == 'true' && '--dev' || '' }}
-    shell: bash
-    working-directory: ${{ inputs.project-directory }}
-  - name: Get PR details
-    id: get-pr-details
-    run: |
-      import pathlib, os, subprocess
-      changed_files = [pathlib.Path(file) for file in subprocess.run(["git", "diff", "--name-only"], capture_output=True, check=True, text=True).stdout.split()]
-      changed_projects = [file for file in changed_files if file.name == "pyproject.toml"]
-      project_info = {}
-      for project in changed_projects:
-          name, version = subprocess.run(["poetry", "version", "-C", str(project.parent)], capture_output=True, check=True, text=True).stdout.split()
-          project_info[project] = {"name": name, "version": version}
-      if len(changed_projects) == 1:
-          title = "chore: Update project {} to v{}".format(project_info[changed_projects[0]]["name"], project_info[changed_projects[0]]["version"])
-      else:
-          title = "chore: Update project versions"
-      base_branch = "${{ steps.set-vars.outputs.base-branch }}"
-      if base_branch not in ["main", "master"]:
-          title = f"[{base_branch}] {title}"
-      with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-          print(f"title={title}", file=output)
-          print("project-table<<EOF", file=output)
-          print("| Project | Version | Path |", file=output)
-          print("|---------|---------|------|", file=output)
-          for project in changed_projects:
-              print(f"| {project_info[project]['name']} | {project_info[project]['version']} | {project} |", file=output)
-          print("EOF", file=output)
-    shell: python
-  - name: Create pull request
-    if: inputs.create-pull-request == 'true'
-    uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
-    env:
-      action-url: https://github.com/${{ github.action_repository }}/tree/${{ github.action_ref }}/update-project-version
-    with:
-      base: ${{ steps.set-vars.outputs.base-branch }}
-      branch: ${{ steps.set-vars.outputs.branch-name }}
-      commit-message: ${{ steps.get-pr-details.outputs.title }}
-      title: ${{ steps.get-pr-details.outputs.title }}
-      token: ${{ inputs.token }}
-      # The workflow log currently points to the run, not the specific job
-      # within that run. Linking to a specific job requires the numeric job id,
-      # which is not available in the github context.
-      # https://stackoverflow.com/questions/71240338/obtain-job-id-from-a-workflow-run-using-contexts
-      body: |
-        This PR updates the versions of the following Python projects:
+    - name: Validate event type
+      if: ${{ github.event_name == 'pull_request_target' || github.event_name == 'workflow_run' }}
+      run: |
+        echo "::error title=Update Project Version Error::Unsupported event '$GITHUB_EVENT_NAME'"
+        exit 1
+      shell: bash
+    - name: Set variables
+      id: set-vars
+      run: |
+        # For release events, github.ref_name is the release tag (e.g. 1.0.0) and
+        # github.event.release.target_commitish is the branch/tag/commit that the
+        # tag was created from (e.g. main).
+        #
+        # For workflow_dispatch events, github.ref_name is the branch/tag/commit
+        # that the workflow was dispatched on.
+        base_branch_no_slashes=$(echo "$BASE_BRANCH" | tr '/' '-')
+        echo "base-branch=$BASE_BRANCH" >> "$GITHUB_OUTPUT"
+        echo "branch-name=${BRANCH_PREFIX}update-project-version-$base_branch_no_slashes" >> "$GITHUB_OUTPUT"
+      shell: bash
+      env:
+        BASE_BRANCH: ${{ github.event_name == 'release' && github.event.release.target_commitish || github.ref_name }}
+        BRANCH_PREFIX: ${{ inputs.branch-prefix }}
+    - name: Update the version in pyproject.toml
+      run: |
+        extra_args=""
+        if [ x"$USE_DEV_SUFFIX" = x"true" ]; then
+          extra_args="--dev $extra_args"
+        fi
+        python ${{ github.action_path }}/update_version.py "$VERSION_RULE" $extra_args
+      shell: bash
+      working-directory: ${{ inputs.project-directory }}
+      env:
+        VERSION_RULE: ${{ inputs.version-rule }}
+        USE_DEV_SUFFIX: ${{ inputs.use-dev-suffix }}
+    - name: Get PR details
+      id: get-pr-details
+      run: |
+        import pathlib, os, subprocess
+        changed_files = [pathlib.Path(file) for file in subprocess.run(["git", "diff", "--name-only"], capture_output=True, check=True, text=True).stdout.split()]
+        changed_projects = [file for file in changed_files if file.name == "pyproject.toml"]
+        project_info = {}
+        for project in changed_projects:
+            name, version = subprocess.run(["poetry", "version", "-C", str(project.parent)], capture_output=True, check=True, text=True).stdout.split()
+            project_info[project] = {"name": name, "version": version}
+        if len(changed_projects) == 1:
+            title = "chore: Update project {} to v{}".format(project_info[changed_projects[0]]["name"], project_info[changed_projects[0]]["version"])
+        else:
+            title = "chore: Update project versions"
+        base_branch = os.environ["BASE_BRANCH"]
+        if base_branch not in ["main", "master"]:
+            title = f"[{base_branch}] {title}"
+        with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+            print(f"title={title}", file=output)
+            print("project-table<<EOF", file=output)
+            print("| Project | Version | Path |", file=output)
+            print("|---------|---------|------|", file=output)
+            for project in changed_projects:
+                print(f"| {project_info[project]['name']} | {project_info[project]['version']} | {project} |", file=output)
+            print("EOF", file=output)
+      shell: python
+      env:
+        BASE_BRANCH: ${{ steps.set-vars.outputs.base-branch }}
+    - name: Create pull request
+      if: inputs.create-pull-request == 'true'
+      uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+      env:
+        action-url: https://github.com/${{ github.action_repository }}/tree/${{ github.action_ref }}/update-project-version
+      with:
+        base: ${{ steps.set-vars.outputs.base-branch }}
+        branch: ${{ steps.set-vars.outputs.branch-name }}
+        commit-message: ${{ steps.get-pr-details.outputs.title }}
+        title: ${{ steps.get-pr-details.outputs.title }}
+        token: ${{ inputs.token }}
+        # The workflow log currently points to the run, not the specific job
+        # within that run. Linking to a specific job requires the numeric job id,
+        # which is not available in the github context.
+        # https://stackoverflow.com/questions/71240338/obtain-job-id-from-a-workflow-run-using-contexts
+        body: |
+          This PR updates the versions of the following Python projects:
 
-        ${{ steps.get-pr-details.outputs.project-table }}
+          ${{ steps.get-pr-details.outputs.project-table }}
 
-        If the checks for this pull request appear to hang, you can work around this by closing and re-opening the PR. See
-        [ni/python-actions/update-project-version >> Inputs >> token](${{ env.action-url }}#token) and 
-        [create-pull-request >> Triggering further workflow runs](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs)
-        for more details.
+          If the checks for this pull request appear to hang, you can work around this by closing and re-opening the PR. See
+          [ni/python-actions/update-project-version >> Inputs >> token](${{ env.action-url }}#token) and 
+          [create-pull-request >> Triggering further workflow runs](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs)
+          for more details.
 
-        This PR was generated by [ni/python-actions/update-project-version](${{ env.action-url }}). View the [workflow log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+          This PR was generated by [ni/python-actions/update-project-version](${{ env.action-url }}). View the [workflow log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).

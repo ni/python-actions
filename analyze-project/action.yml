@@ -1,6 +1,6 @@
 name: Analyze project
 description: >
-  This workflow analyzes the code quality of a Python project using various
+  This action analyzes the code quality of a Python project using various
   linters and type checkers including ni-python-styleguide,
   mypy (if the 'mypy' package is installed), and pyright (if the 'pyright'
   package is installed).
@@ -11,7 +11,9 @@ inputs:
     default: ${{ github.workspace }}
   install-args:
     # E.g. "--extras 'drivers addons' --with examples,docs"
-    description: 'Extra arguments. Install command will be "poetry install <install-args>".'
+    description: >
+      Extra arguments. Install command will be "poetry install -v <install-args>".
+      Do not pass untrusted user input.
     default: ''
     required: false
     type: string
@@ -19,6 +21,12 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Validate event type
+      if: ${{ github.event_name == 'pull_request_target' || github.event_name == 'workflow_run' }}
+      run: |
+        echo "::error title=Analyze Project Error::Unsupported event '$GITHUB_EVENT_NAME'"
+        exit 1
+      shell: bash
     - name: Get project info
       id: get_project_info
       run: |
@@ -36,14 +44,17 @@ runs:
       shell: bash
       working-directory: ${{ inputs.project-directory }}
     - name: Check for lock changes
-      run: poetry check --lock -C "${{ inputs.project-directory }}"
+      run: poetry check --lock
       shell: bash
+      working-directory: ${{ inputs.project-directory }}
     - name: Generate install args hash
       id: install_args_hash
       run: |
-        install_args_hash=$(echo "${{ inputs.install-args }}" | sha256sum | cut -d ' ' -f1)
+        install_args_hash=$(echo "$INSTALL_ARGS" | sha256sum | cut -d ' ' -f1)
         echo "hash=$install_args_hash" >> "$GITHUB_OUTPUT"
       shell: bash
+      env:
+        INSTALL_ARGS: ${{ inputs.install-args }}
     - name: Cache virtualenv
       uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
@@ -51,10 +62,12 @@ runs:
         key: ${{ steps.get_project_info.outputs.name }}-${{ runner.os }}-py${{ env.pythonVersion }}-${{ hashFiles(format('{0}/poetry.lock', inputs.project-directory)) }}-${{ steps.install_args_hash.outputs.hash }}
     - name: Install ${{ steps.get_project_info.outputs.name }}
       run: |
-        install_cmd="poetry install -v ${{ inputs.install-args }}"
+        install_cmd="poetry install -v $INSTALL_ARGS"
         eval $install_cmd
       working-directory: ${{ inputs.project-directory }}
       shell: bash
+      env:
+        INSTALL_ARGS: ${{ inputs.install-args }}
     - name: Lint
       run: poetry run ni-python-styleguide lint
       working-directory: ${{ inputs.project-directory }}
@@ -79,9 +92,12 @@ runs:
       shell: poetry run python {0}
     - name: Echo check_tools outputs
       run: |
-        echo "mypy installed: ${{ steps.check_tools.outputs.mypy }}"
-        echo "pyright installed: ${{ steps.check_tools.outputs.pyright }}"
+        echo "mypy installed: $MYPY_INSTALLED"
+        echo "pyright installed: $PYRIGHT_INSTALLED"
       shell: bash
+      env:
+        MYPY_INSTALLED: ${{ steps.check_tools.outputs.mypy }}
+        PYRIGHT_INSTALLED: ${{ steps.check_tools.outputs.pyright }}
     - name: Mypy static analysis
       if: steps.check_tools.outputs.mypy == 'true'
       run: poetry run mypy
@@ -90,7 +106,7 @@ runs:
     - name: Add virtualenv to the path for pyright-action
       if: steps.check_tools.outputs.pyright == 'true'
       shell: bash
-      run: |
+      run: | # zizmor: ignore[github-env] # intentionally add project venv to the path
         echo "$(dirname $(poetry env info --executable))" >> $GITHUB_PATH
       working-directory: ${{ inputs.project-directory }}
     - name: Pyright static analysis

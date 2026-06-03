@@ -8,6 +8,8 @@ on:
   workflow_call:
   workflow_dispatch:
 
+permissions: {}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -16,3 +18,5 @@ jobs:
   run_ci:
     name: Run CI
     uses: ./.github/workflows/CI.yml
+    permissions:
+      security-events: write

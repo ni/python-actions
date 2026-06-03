@@ -25,7 +25,7 @@ runs:
         fi 
       shell: bash
     - name: Set paths
-      run: |
+      run: | # zizmor: ignore[github-env] # paths are based on RUNNER_TEMP, not user input
         poetry_root="$RUNNER_TEMP/poetry"
         poetry_home="$poetry_root/home"
         poetry_bin="$poetry_root/bin"
@@ -62,11 +62,17 @@ runs:
     - name: Install Poetry
       if: steps.cache-poetry.outputs.cache-hit != 'true'
       run: |
+        if [[ ! "$POETRY_VERSION" =~ ^([0-9]+)\.([0-9]+)(\.([0-9]+))?((a|b|rc)[0-9]+)?(\.post[0-9]+)?$ ]]; then
+          echo "::error title=Setup Poetry Error::Invalid version number: '$POETRY_VERSION'"
+          exit 1
+        fi
         python -m venv "$POETRY_HOME"
-        "$POETRY_HOME_BIN/python" -m pip install poetry==${{ inputs.poetry-version }}
+        "$POETRY_HOME_BIN/python" -m pip install "poetry==$POETRY_VERSION"
         mkdir -p "$POETRY_BIN_DIR"
         ln -s "$POETRY_HOME_BIN/poetry"* "$POETRY_BIN_DIR/"
       shell: bash
+      env:
+        POETRY_VERSION: ${{ inputs.poetry-version }}
     - name: Print Poetry version
       run: poetry --version
       shell: bash
