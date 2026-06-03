@@ -17,6 +17,11 @@ inputs:
     default: ''
     required: false
     type: string
+  use-cache:
+    description: >
+      A Boolean specifying whether to use the cache. Set this to false to work
+      around caching problems.
+    default: true
 
 runs:
   using: composite
@@ -56,7 +61,10 @@ runs:
       env:
         INSTALL_ARGS: ${{ inputs.install-args }}
     - name: Cache virtualenv
+      if: ${{ inputs.use-cache == 'true' }}
       uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      # Work around https://github.com/actions/cache/issues/1754 - Windows runner randomly dies in actions/cache
+      continue-on-error: true
       with:
         path: ${{ steps.get_project_info.outputs.venv-path }}
         key: ${{ steps.get_project_info.outputs.name }}-${{ runner.os }}-py${{ env.pythonVersion }}-${{ hashFiles(format('{0}/poetry.lock', inputs.project-directory)) }}-${{ steps.install_args_hash.outputs.hash }}

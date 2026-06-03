@@ -52,3 +52,7 @@ For example,
     project-directory: ${{ github.workspace }}/packages/myproject
     install-args: "--extras 'colors serialization' --with dev,docs,utils"
 ```
+
+### `use-cache`
+
+If you run into caching problems, you can disable caching by specifying `use-cache: false`.
