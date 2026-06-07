@@ -93,9 +93,7 @@ runs:
       run: |
         python -m venv "$POETRY_HOME"
         if [ x"$USE_LOCK_FILE" = x"true" ]; then
-          # pylock.toml support was added in pip 26.1
-          "$POETRY_HOME_BIN/python" -m pip install -U pip
-          "$POETRY_HOME_BIN/python" -m pip install --no-deps -r "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION/pylock.toml"
+          "$POETRY_HOME_BIN/python" -m pip install --no-deps -r "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION/requirements.txt"
         else
           "$POETRY_HOME_BIN/python" -m pip install "poetry==$POETRY_VERSION"
         fi
