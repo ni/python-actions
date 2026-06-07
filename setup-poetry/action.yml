@@ -8,6 +8,11 @@ inputs:
       A Boolean specifying whether to use the cache. Set this to false to work
       around caching problems.
     default: true
+  use-lock-file:
+    description: >
+      A Boolean specifying whether to use a lock file when installing Poetry and
+      its dependencies.
+    default: true
 outputs:
   cache-hit:
     description: >
@@ -24,6 +29,20 @@ runs:
           exit 1
         fi 
       shell: bash
+    - name: Validate Poetry version
+      run: |
+        if [[ ! "$POETRY_VERSION" =~ ^([0-9]+)\.([0-9]+)(\.([0-9]+))?((a|b|rc)[0-9]+)?(\.post[0-9]+)?$ ]]; then
+          echo "::error title=Setup Poetry Error::Invalid version number: '$POETRY_VERSION'"
+          exit 1
+        fi
+        if [ x"$USE_LOCK_FILE" = x"true" -a ! -d "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION" ]; then
+          echo "::error title=Setup Poetry Error::Lock file does not exist for version: '$POETRY_VERSION'"
+          exit 1
+        fi
+      shell: bash
+      env:
+        POETRY_VERSION: ${{ inputs.poetry-version }}
+        USE_LOCK_FILE: ${{ inputs.use-lock-file }}
     - name: Set paths
       run: | # zizmor: ignore[github-env] # paths are based on RUNNER_TEMP, not user input
         poetry_root="$RUNNER_TEMP/poetry"
@@ -47,8 +66,16 @@ runs:
       run: |
         echo "poetry-bin-dir=$POETRY_BIN_DIR" >> "$GITHUB_OUTPUT"
         echo "poetry-home=$POETRY_HOME" >> "$GITHUB_OUTPUT"
-        echo "poetry-hash=$(echo "$POETRY_BIN_DIR" | sha256sum | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+        echo "poetry-hash=$(echo "$POETRY_BIN_DIR" | sha256sum | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
+        if [ x"$USE_LOCK_FILE" = x"true" ]; then
+          echo "poetry-lock-hash=$(echo "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION" | sha256sum | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
+        else
+          echo "poetry-lock-hash=no-lock-file" >> "$GITHUB_OUTPUT"
+        fi
       shell: bash
+      env:
+        POETRY_VERSION: ${{ inputs.poetry-version }}
+        USE_LOCK_FILE: ${{ inputs.use-lock-file }}
     - name: Cache poetry
       if: ${{ inputs.use-cache == 'true' }}
       id: cache-poetry
@@ -60,21 +87,24 @@ runs:
         path: |
           ${{ steps.copy-paths.outputs.poetry-bin-dir }}/poetry*
           ${{ steps.copy-paths.outputs.poetry-home }}          
-        key: poetry${{ inputs.poetry-version }}-${{ runner.os }}-py${{ env.pythonVersion }}-${{ steps.copy-paths.outputs.poetry-hash}}
+        key: poetry${{ inputs.poetry-version }}-${{ runner.os }}-py${{ env.pythonVersion }}-${{ steps.copy-paths.outputs.poetry-hash}}-${{ steps.copy-paths.outputs.poetry-lock-hash }}
     - name: Install Poetry
       if: steps.cache-poetry.outputs.cache-hit != 'true'
       run: |
-        if [[ ! "$POETRY_VERSION" =~ ^([0-9]+)\.([0-9]+)(\.([0-9]+))?((a|b|rc)[0-9]+)?(\.post[0-9]+)?$ ]]; then
-          echo "::error title=Setup Poetry Error::Invalid version number: '$POETRY_VERSION'"
-          exit 1
-        fi
         python -m venv "$POETRY_HOME"
-        "$POETRY_HOME_BIN/python" -m pip install "poetry==$POETRY_VERSION"
+        if [ x"$USE_LOCK_FILE" = x"true" ]; then
+          # pylock.toml support was added in pip 26.1
+          "$POETRY_HOME_BIN/python" -m pip install -U pip
+          "$POETRY_HOME_BIN/python" -m pip install --no-deps -r "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION/pylock.toml"
+        else
+          "$POETRY_HOME_BIN/python" -m pip install "poetry==$POETRY_VERSION"
+        fi
         mkdir -p "$POETRY_BIN_DIR"
         ln -s "$POETRY_HOME_BIN/poetry"* "$POETRY_BIN_DIR/"
       shell: bash
       env:
         POETRY_VERSION: ${{ inputs.poetry-version }}
+        USE_LOCK_FILE: ${{ inputs.use-lock-file }}
     - name: Print Poetry version
       run: poetry --version
       shell: bash
