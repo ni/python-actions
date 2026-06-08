@@ -35,7 +35,7 @@ runs:
           echo "::error title=Setup Poetry Error::Invalid version number: '$POETRY_VERSION'"
           exit 1
         fi
-        if [ x"$USE_LOCK_FILE" = x"true" -a ! -d "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION" ]; then
+        if [ x"$USE_LOCK_FILE" = x"true" -a ! -f "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION/requirements.txt" ]; then
           echo "::error title=Setup Poetry Error::Lock file does not exist for version: '$POETRY_VERSION'"
           exit 1
         fi
@@ -66,9 +66,11 @@ runs:
       run: |
         echo "poetry-bin-dir=$POETRY_BIN_DIR" >> "$GITHUB_OUTPUT"
         echo "poetry-home=$POETRY_HOME" >> "$GITHUB_OUTPUT"
+        # poetry-hash is a hash of the variable, not the directory it references.
         echo "poetry-hash=$(echo "$POETRY_BIN_DIR" | sha256sum | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
         if [ x"$USE_LOCK_FILE" = x"true" ]; then
-          echo "poetry-lock-hash=$(echo "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION" | sha256sum | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
+          # poetry-lock-hash is a hash of the lock file.
+          echo "poetry-lock-hash=$(cat "$GITHUB_ACTION_PATH/versions/$POETRY_VERSION/requirements.txt" | sha256sum | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
         else
           echo "poetry-lock-hash=no-lock-file" >> "$GITHUB_OUTPUT"
         fi
