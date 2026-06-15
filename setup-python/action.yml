@@ -2,7 +2,7 @@ name: Set up Python
 description: Install Python with appropriate defaults for NI Python projects.
 inputs:
   python-version:
-    default: 3.11.9
+    default: 3.13.11
 outputs:
   python-path:
     value: ${{ steps.setup-python.outputs.python-path }}
