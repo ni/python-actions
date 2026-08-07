@@ -1,0 +1,7 @@
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+# Recent versions of cryptography do not support 3.9.0 or 3.9.1.
+python = "^3.9.2"
+poetry = "2.2.1"
