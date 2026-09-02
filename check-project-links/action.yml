@@ -41,7 +41,7 @@ runs:
         manifest_links="$(mktemp)"
         link_file="$(mktemp)"
         cleanup() {
-          rm -f "$manifest_links" "$link_file" "${link_file}.https"
+          rm -f "$manifest_links" "$link_file" "${link_file}.https" "${link_file}.filtered"
         }
         trap cleanup EXIT
 
@@ -128,6 +128,42 @@ runs:
         grep -v 'http://' "$link_file" > "${link_file}.https" || true
         if [ -s "${link_file}.https" ]; then
           mv "${link_file}.https" "$link_file"
+        else
+          : > "$link_file"
+        fi
+
+        # Explicitly drop localhost and any IP-based hostname before validation.
+        : > "${link_file}.filtered"
+        while IFS= read -r url; do
+          [ -n "$url" ] || continue
+
+          host="${url#*://}"
+          host="${host%%/*}"
+          host="${host%%:*}"
+          host="${host,,}"
+          host="${host%.}"
+
+          if printf '%s\n' "$host" | grep -Eq '^(localhost|.*\.localhost)$'; then
+            continue
+          fi
+          if printf '%s\n' "$host" | grep -Eq '^[0-9]+(\.[0-9]+){3}$'; then
+            continue
+          fi
+          if printf '%s\n' "$host" | grep -Eq '^(::1|[0-9a-fA-F:]+)$'; then
+            continue
+          fi
+          if printf '%s\n' "$host" | grep -Eq '^(127\.|0\.0\.0\.0|169\.254\.|metadata(\.google\.internal)?)$'; then
+            continue
+          fi
+          if printf '%s\n' "$host" | grep -Eq '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|fc[0-9a-fA-F:]+|fe[89ab][0-9a-fA-F:]+)$'; then
+            continue
+          fi
+
+          printf '%s\n' "$url" >> "${link_file}.filtered"
+        done < "$link_file"
+
+        if [ -s "${link_file}.filtered" ]; then
+          mv "${link_file}.filtered" "$link_file"
         else
           : > "$link_file"
         fi
