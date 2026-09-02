@@ -40,8 +40,10 @@ runs:
           rm -f "$link_file"
         }
         trap cleanup EXIT
+        chmod 0644 "$link_file"
 
         python3 "$GITHUB_ACTION_PATH/_find_project_links.py" "$PROJECT_DIRECTORY" "$ALLOWED_DOMAINS" "$link_file"
+        chmod 0644 "$link_file"
 
         if [ ! -s "$link_file" ]; then
           echo "No trusted project links found under $PROJECT_DIRECTORY."
