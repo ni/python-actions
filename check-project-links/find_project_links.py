@@ -9,14 +9,18 @@ from urllib.parse import urlsplit
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover
-    raise Exception('tomllib is not available. Please use Python 3.11 or later.')
+    raise Exception("tomllib is not available. Please use Python 3.11 or later.")
 
 
 def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description='Collect trusted project URLs from pyproject.toml files.')
-    parser.add_argument('project_directory', help='Directory containing project pyproject.toml files.')
-    parser.add_argument('allowed_domains', help='Comma-separated list of allowed domains.')
-    parser.add_argument('output_path', help='Path to write discovered URLs.')
+    parser = argparse.ArgumentParser(
+        description="Collect trusted project URLs from pyproject.toml files."
+    )
+    parser.add_argument(
+        "project_directory", help="Directory containing project pyproject.toml files."
+    )
+    parser.add_argument("allowed_domains", help="Comma-separated list of allowed domains.")
+    parser.add_argument("output_path", help="Path to write discovered URLs.")
     return parser.parse_args()
 
 
@@ -35,8 +39,8 @@ def _is_allowed(hostname: str, allowed: set[str]) -> bool:
     if not hostname:
         return False
 
-    host = hostname.lower().rstrip('.')
-    if host == 'localhost' or host.endswith('.localhost'):
+    host = hostname.lower().rstrip(".")
+    if host == "localhost" or host.endswith(".localhost"):
         return False
 
     try:
@@ -50,7 +54,9 @@ def _is_allowed(hostname: str, allowed: set[str]) -> bool:
     if host in allowed:
         return True
 
-    if any(host.endswith(f'.{domain.lstrip(".*")}') for domain in allowed if domain.startswith('*.')):
+    if any(
+        host.endswith(f'.{domain.lstrip(".*")}') for domain in allowed if domain.startswith("*.")
+    ):
         return True
 
     return False
@@ -78,7 +84,7 @@ def _walk_metadata(value, results: set[str], allowed: set[str]) -> None:
         for item in value:
             _walk_metadata(item, results, allowed)
     elif isinstance(value, str):
-        if not value.startswith('https://'):
+        if not value.startswith("https://"):
             return
         host = urlsplit(value).hostname
         if host and _is_allowed(host, allowed):
@@ -94,8 +100,8 @@ def _main() -> int:
     safe_output_path = _safe_under("/tmp", os.path.realpath(args.output_path, strict=True))
 
     allowed: set[str] = set()
-    for raw_domain in allowed_domains.split(','):
-        domain = raw_domain.strip().lower().rstrip('.')
+    for raw_domain in allowed_domains.split(","):
+        domain = raw_domain.strip().lower().rstrip(".")
         if domain:
             allowed.add(domain)
 
@@ -103,28 +109,33 @@ def _main() -> int:
 
     for root, _, files in os.walk(safe_project_directory):
         for file_name in files:
-            if file_name != 'pyproject.toml':
+            if file_name != "pyproject.toml":
                 continue
 
             manifest_path = _safe_under(safe_project_directory, os.path.join(root, file_name))
             try:
-                with open(manifest_path, 'rb') as manifest_file:
+                with open(manifest_path, "rb") as manifest_file:
                     metadata = tomllib.load(manifest_file)
             except (OSError, tomllib.TOMLDecodeError):
-                print(f"Warning: Failed to read or parse pyproject.toml at {manifest_path}", file=sys.stderr)
+                print(
+                    f"Warning: Failed to read or parse pyproject.toml at {manifest_path}",
+                    file=sys.stderr,
+                )
                 continue
 
             _walk_metadata(metadata, results, allowed)
             # Also find any commented URLs in the pyproject.toml file
             try:
-                with open(manifest_path, 'r', encoding='utf-8') as manifest_file:
+                with open(manifest_path, "r", encoding="utf-8") as manifest_file:
                     for line in manifest_file:
                         line = line.strip()
-                        prefix, comment = line.split('#', maxsplit=1) if '#' in line else (line, '')
+                        prefix, comment = line.split("#", maxsplit=1) if "#" in line else (line, "")
                         if comment.strip():
                             comment = comment.strip()
-                            if comment.startswith('https://'):
-                                host = urlsplit(comment).hostname  # handles extra at the end just fine
+                            if comment.startswith("https://"):
+                                host = urlsplit(
+                                    comment
+                                ).hostname  # handles extra at the end just fine
                                 if host and _is_allowed(host, allowed):
                                     results.add(comment)
             except OSError:
@@ -135,12 +146,12 @@ def _main() -> int:
     if output_directory:
         os.makedirs(output_directory, exist_ok=True)
 
-    with open(safe_output_path, 'w', encoding='utf-8') as output_file:
+    with open(safe_output_path, "w", encoding="utf-8") as output_file:
         for url in sorted(results):
-            output_file.write(f'{url}\n')
+            output_file.write(f"{url}\n")
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(_main())
