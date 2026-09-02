@@ -254,6 +254,63 @@ jobs:
           project-directory: test-project
           expected-version: 1.0.2.dev1
 
+  test_check_project_links:
+    name: Test check-project-links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Create project with a valid link
+        run: |
+          mkdir -p test-project
+          cat > test-project/pyproject.toml <<'EOF'
+          [project]
+          name = "test-project"
+          version = "0.1.0"
+          description = "Test project with a valid URL"
+          authors = [{ name = "NI" }]
+          readme = "README.md"
+          requires-python = ">=3.9"
+
+          [project.urls]
+          Homepage = "https://github.com/ni/python-actions"
+          Documentation = "https://github.com/ni/python-actions/blob/main/README.md"
+          EOF
+        shell: bash
+      - name: Check valid project links
+        uses: ./check-project-links
+        with:
+          project-directory: test-project
+      - name: Create project with a missing link
+        run: |
+          mkdir -p failing-project
+          cat > failing-project/pyproject.toml <<'EOF'
+          [project]
+          name = "failing-project"
+          version = "0.1.0"
+          description = "Test project with a 404 URL"
+          authors = [{ name = "NI" }]
+          readme = "README.md"
+          requires-python = ">=3.9"
+
+          [project.urls]
+          Broken = "https://github.com/ni/project-that-does-not-exist"
+          EOF
+        shell: bash
+      - name: Check missing project link (expected to fail)
+        id: expected-failure
+        continue-on-error: true
+        uses: ./check-project-links
+        with:
+          project-directory: failing-project
+      - name: Error if the previous step didn't fail
+        if: steps.expected-failure.outcome != 'failure'
+        run: |
+          echo "::error title=Test Failure::The previous step did not fail as expected."
+          exit 1
+
   test_analyze_project:
     name: Test analyze-project
     runs-on: ${{ matrix.os }}
@@ -454,6 +511,7 @@ jobs:
       test_setup_poetry_no_cache,
       test_check_project_version,
       test_update_project_version,
+      test_check_project_links,
       test_analyze_project,
       test_analyze_project_repo_root,
     ]
