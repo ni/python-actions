@@ -16,11 +16,16 @@ Docker image used to perform the HTTP requests.
 
 Default: `curlimages/curl:8.22.0`
 
-## Example
+## Examples
+
+> [!NOTE]
+> These examples use `@v0`, but pinning to a commit hash or full release tag is recommended for
+> build reproducibility and security.
+
 
 ```yaml
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v0
 
   - name: Check project links
     uses: ni/python-actions/check-project-links@v1
