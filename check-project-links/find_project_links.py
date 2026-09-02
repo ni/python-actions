@@ -12,7 +12,7 @@ except ModuleNotFoundError:  # pragma: no cover
     raise Exception('tomllib is not available. Please use Python 3.11 or later.')
 
 
-def parse_args() -> argparse.Namespace:
+def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Collect trusted project URLs from pyproject.toml files.')
     parser.add_argument('project_directory', help='Directory containing project pyproject.toml files.')
     parser.add_argument('allowed_domains', help='Comma-separated list of allowed domains.')
@@ -20,17 +20,17 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def is_allowed(hostname: str, allowed: set[str]) -> bool:
+def _is_allowed(hostname: str, allowed: set[str]) -> bool:
     """
     Check if the given hostname is allowed based on the provided set of allowed domains.
 
-    >>> is_allowed('example.com', {'example.com'})
+    >>> _is_allowed('example.com', {'example.com'})
     True
 
-    >>> is_allowed('sub.example.com', {'example.com'})
+    >>> _is_allowed('sub.example.com', {'example.com'})
     False
 
-    >>> is_allowed('sub.example.com', {'*.example.com'})
+    >>> _is_allowed('sub.example.com', {'*.example.com'})
     True
     """
     if not hostname:
@@ -57,7 +57,7 @@ def is_allowed(hostname: str, allowed: set[str]) -> bool:
     return False
 
 
-def safe_under(base_dir: str, candidate_path: str) -> str:
+def _safe_under(base_dir: str, candidate_path: str) -> str:
     """Return a canonical path that stays under base_dir, or raise ValueError."""
     safe_base = os.path.realpath(base_dir)
     safe_candidate = os.path.realpath(candidate_path)
@@ -71,28 +71,28 @@ def safe_under(base_dir: str, candidate_path: str) -> str:
     return safe_candidate
 
 
-def walk_metadata(value, results: set[str], allowed: set[str]) -> None:
+def _walk_metadata(value, results: set[str], allowed: set[str]) -> None:
     if isinstance(value, dict):
         for item in value.values():
-            walk_metadata(item, results, allowed)
+            _walk_metadata(item, results, allowed)
     elif isinstance(value, list):
         for item in value:
-            walk_metadata(item, results, allowed)
+            _walk_metadata(item, results, allowed)
     elif isinstance(value, str):
         if not value.startswith('https://'):
             return
         host = urlsplit(value).hostname
-        if host and is_allowed(host, allowed):
+        if host and _is_allowed(host, allowed):
             results.add(value)
 
 
-def main() -> int:
-    args = parse_args()
+def _main() -> int:
+    args = _parse_args()
     project_directory = args.project_directory
     safe_project_directory = os.path.realpath(project_directory, strict=True)
-    safe_project_directory = safe_under(os.getcwd(), safe_project_directory)
+    safe_project_directory = _safe_under(os.getcwd(), safe_project_directory)
     allowed_domains = args.allowed_domains
-    safe_output_path = safe_under("/tmp", os.path.realpath(args.output_path, strict=True))
+    safe_output_path = _safe_under("/tmp", os.path.realpath(args.output_path, strict=True))
 
     allowed: set[str] = set()
     for raw_domain in allowed_domains.split(','):
@@ -107,7 +107,7 @@ def main() -> int:
             if file_name != 'pyproject.toml':
                 continue
 
-            manifest_path = safe_under(safe_project_directory, os.path.join(root, file_name))
+            manifest_path = _safe_under(safe_project_directory, os.path.join(root, file_name))
             try:
                 with open(manifest_path, 'rb') as manifest_file:
                     metadata = tomllib.load(manifest_file)
@@ -115,7 +115,7 @@ def main() -> int:
                 print(f"Warning: Failed to read or parse pyproject.toml at {manifest_path}", file=sys.stderr)
                 continue
 
-            walk_metadata(metadata, results, allowed)
+            _walk_metadata(metadata, results, allowed)
             # Also find any commented URLs in the pyproject.toml file
             try:
                 with open(manifest_path, 'r', encoding='utf-8') as manifest_file:
@@ -126,7 +126,7 @@ def main() -> int:
                             comment = comment.strip()
                             if comment.startswith('https://'):
                                 host = urlsplit(comment).hostname  # handles extra at the end just fine
-                                if host and is_allowed(host, allowed):
+                                if host and _is_allowed(host, allowed):
                                     results.add(comment)
             except OSError:
                 print(f"Warning: Failed to read pyproject.toml at {manifest_path}", file=sys.stderr)
@@ -144,4 +144,4 @@ def main() -> int:
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(_main())
