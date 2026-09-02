@@ -61,12 +61,12 @@ runs:
         while IFS= read -r manifest; do
           if [ -n "$manifest" ]; then
             if [ "$rg_available" -eq 1 ]; then
-              rg -o "https\?://[^\"[:space:]]+" "$manifest" || true
+              rg -o 'https://[^"[:space:]]+' "$manifest" || true
               if rg 'http://' "$manifest" >/dev/null 2>&1; then
                 echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $manifest. Consider using HTTPS instead. Ignoring link."
               fi
             else
-              grep -Eo 'https?://[^[:space:]\"]+' "$manifest" || true
+              grep -Eo 'https://[^[:space:]\"]+' "$manifest" || true
               if grep -Eq 'http://' "$manifest"; then
                 echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $manifest. Consider using HTTPS instead. Ignoring link."
               fi

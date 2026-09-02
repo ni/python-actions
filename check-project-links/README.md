@@ -45,8 +45,8 @@ steps:
 ## Behavior
 
 - Uses `rg` to locate `pyproject.toml` files beneath the configured project directory when available.
-- Falls back to `grep` with a warning if `rg` is not installed; consider adding a pre-step to install `rg` for faster runtime.
-- Extracts every `https://...` URL that ends at the first whitespace character.
+- Falls back to `find` (discovery) and `grep` (extraction) with a warning if `rg` is not installed; consider adding a pre-step to install `rg` for faster runtime.
+- Extracts every `https://...` URL that ends at the first whitespace or double-quote character.
 - Drops any URL whose hostname is `localhost`, a local loopback address, or any literal IP address before validation.
 - Deduplicates the list of URLs and writes them to a temporary file.
 - Validates each URL with the configured Docker image.
