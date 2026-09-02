@@ -16,6 +16,9 @@ Docker image used to perform the HTTP requests.
 
 Default: `curlimages/curl:8.22.0`
 
+> [!NOTE]
+> The action default uses a full digest sha. Although the action does not require this.
+
 ## Examples
 
 > [!NOTE]
