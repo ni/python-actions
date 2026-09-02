@@ -41,7 +41,7 @@ runs:
         manifest_links="$(mktemp)"
         link_file="$(mktemp)"
         cleanup() {
-          rm -f "$manifest_links" "$link_file"
+          rm -f "$manifest_links" "$link_file" "${link_file}.https"
         }
         trap cleanup EXIT
 
@@ -53,9 +53,9 @@ runs:
         fi
 
         if [ "$rg_available" -eq 1 ]; then
-          manifest_list_cmd="rg --files -g 'pyproject.toml' \"$project_directory\""
+          manifest_list_cmd=(rg --files -g 'pyproject.toml' "$project_directory")
         else
-          manifest_list_cmd="find \"$project_directory\" -type f -name 'pyproject.toml'"
+          manifest_list_cmd=(find "$project_directory" -type f -name 'pyproject.toml')
         fi
 
         while IFS= read -r manifest; do
@@ -72,7 +72,7 @@ runs:
               fi
             fi
           fi
-        done < <(eval "$manifest_list_cmd") | sort -u > "$manifest_links"
+        done < <("${manifest_list_cmd[@]}") | sort -u > "$manifest_links"
 
         : > "$link_file"
         while IFS= read -r url; do
@@ -109,15 +109,13 @@ runs:
 
             if [ "${domain:0:2}" = '*.' ]; then
               suffix="${domain#*.}"
-              if printf '%s\n' "$host" | grep -Eq "^([A-Za-z0-9-]+\.)*${suffix//./\\.}$"; then
-                allowed=1
-                break
-              fi
+              case "$host" in
+                "$suffix"|*."$suffix") allowed=1; break ;;
+              esac
             else
-              if [ "$host" = "$domain" ] || printf '%s\n' "$host" | grep -Eq "^([A-Za-z0-9-]+\.)+${domain//./\\.}$"; then
-                allowed=1
-                break
-              fi
+              case "$host" in
+                "$domain"|*."$domain") allowed=1; break ;;
+              esac
             fi
           done
 
@@ -149,7 +147,7 @@ runs:
             failed=0
             while IFS= read -r url; do
               [ -n "$url" ] || continue
-              status=$(curl -L -sS -o /tmp/link_body -w "%{http_code}" "$url" || true)
+              status=$(curl -L -sS --connect-timeout 5 --max-time 20 -o /tmp/link_body -w "%{http_code}" "$url" || true)
               case "$status" in
                 2??|3??)
                   echo "PASS $url -> $status"
