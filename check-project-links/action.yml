@@ -14,11 +14,14 @@ runs:
   steps:
     - name: Check project links
       shell: bash
+      env:
+        PROJECT_DIRECTORY: ${{ inputs.project-directory }}
+        DOCKER_IMAGE: ${{ inputs.docker-image }}
       run: |
         set -u
 
-        project_directory="${{ inputs.project-directory }}"
-        docker_image="${{ inputs.docker-image }}"
+        project_directory="$PROJECT_DIRECTORY"
+        docker_image="$DOCKER_IMAGE"
 
         if [ ! -d "$project_directory" ]; then
           echo "::error title=Check Project Links Error::Project directory '$project_directory' does not exist."
