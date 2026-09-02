@@ -5,6 +5,9 @@ inputs:
   project-directory:
     description: Path to the directory containing pyproject.toml files.
     default: ${{ github.workspace }}
+  allowed-domains:
+    description: Comma-separated list of trusted hostnames or domains to validate. Supports wildcards like *.readthedocs.io.
+    default: github.com,ni.github.io,*.readthedocs.io
   docker-image:
     description: Docker image used to validate each discovered URL.
     default: curlimages/curl:8.22.0@sha256:58adaa4e8dca9c988bae2aba4ab3434a0bb2da16bbe3f92dec39ec7785166777
@@ -16,11 +19,13 @@ runs:
       shell: bash
       env:
         PROJECT_DIRECTORY: ${{ inputs.project-directory }}
+        ALLOWED_DOMAINS: ${{ inputs.allowed-domains }}
         DOCKER_IMAGE: ${{ inputs.docker-image }}
       run: |
         set -u
 
         project_directory="$PROJECT_DIRECTORY"
+        allowed_domains="$ALLOWED_DOMAINS"
         docker_image="$DOCKER_IMAGE"
 
         if [ ! -d "$project_directory" ]; then
@@ -28,25 +33,88 @@ runs:
           exit 1
         fi
 
+        manifest_links="$(mktemp)"
         link_file="$(mktemp)"
         cleanup() {
-          rm -f "$link_file"
+          rm -f "$manifest_links" "$link_file"
         }
         trap cleanup EXIT
 
         while IFS= read -r manifest; do
           if [ -n "$manifest" ]; then
-            rg -o "https://[^\"[:space:]]+" "$manifest" || true
-            rg 'http://' "$manifest" && echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $manifest. Consider using HTTPS instead. Ignoring link." || true
+            rg -o "https\?://[^\"[:space:]]+" "$manifest" || true
+            if rg 'http://' "$manifest" >/dev/null; then
+              echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $manifest. Consider using HTTPS instead. Ignoring link."
+            fi
           fi
-        done < <(rg --files -g 'pyproject.toml' "$project_directory") | sort -u > "$link_file"
+        done < <(rg --files -g 'pyproject.toml' "$project_directory") | sort -u > "$manifest_links"
+
+        : > "$link_file"
+        while IFS= read -r url; do
+          [ -n "$url" ] || continue
+
+          if printf '%s\n' "$url" | grep -q 'http://'; then
+            echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $url. Ignoring link."
+            continue
+          fi
+
+          host="${url#*://}"
+          host="${host%%/*}"
+          host="${host%%:*}"
+          host="${host,,}"
+          host="${host%.}"
+
+          if printf '%s\n' "$host" | grep -Eq '^(localhost|.*\.localhost)$'; then
+            continue
+          fi
+          if printf '%s\n' "$host" | grep -Eq '^(127\.|0\.0\.0\.0|::1|169\.254\.|metadata(\.google\.internal)?)$'; then
+            continue
+          fi
+          if printf '%s\n' "$host" | grep -Eq '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|169\.254\.|fc[0-9a-fA-F:]+|fe[89ab][0-9a-fA-F:]+)$'; then
+            continue
+          fi
+
+          allowed=0
+          IFS=',' read -ra domains <<< "$allowed_domains"
+          for domain in "${domains[@]}"; do
+            domain="${domain//[[:space:]]/}"
+            [ -n "$domain" ] || continue
+            domain="${domain,,}"
+            domain="${domain%.}"
+
+            if [ "${domain:0:2}" = '*.' ]; then
+              suffix="${domain#*.}"
+              if printf '%s\n' "$host" | grep -Eq "^([A-Za-z0-9-]+\.)*${suffix//./\\.}$"; then
+                allowed=1
+                break
+              fi
+            else
+              if [ "$host" = "$domain" ] || printf '%s\n' "$host" | grep -Eq "^([A-Za-z0-9-]+\.)+${domain//./\\.}$"; then
+                allowed=1
+                break
+              fi
+            fi
+          done
+
+          if [ "$allowed" -eq 1 ]; then
+            printf '%s\n' "$url" >> "$link_file"
+          fi
+        done < "$manifest_links"
+
+        # Explicitly drop insecure HTTP links before validation.
+        grep -v 'http://' "$link_file" > "${link_file}.https" || true
+        if [ -s "${link_file}.https" ]; then
+          mv "${link_file}.https" "$link_file"
+        else
+          : > "$link_file"
+        fi
 
         if [ ! -s "$link_file" ]; then
-          echo "No project links found under $project_directory."
+          echo "No trusted project links found under $project_directory."
           exit 0
         fi
 
-        echo "Found $(wc -l < "$link_file") unique links:"
+        echo "Found $(wc -l < "$link_file") unique trusted links:"
         cat "$link_file"
 
         docker run --rm \
