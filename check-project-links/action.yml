@@ -24,7 +24,6 @@ runs:
       run: |
         set -u
 
-
         if ! command -v docker >/dev/null 2>&1; then
           echo "::error title=Check Project Links Error::docker is not available. Install Docker or add a pre-step that installs it before using this action."
           exit 1
