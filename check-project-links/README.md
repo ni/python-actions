@@ -39,10 +39,12 @@ steps:
 
 ## Behavior
 
-- Uses `rg` to locate `pyproject.toml` files beneath the configured project directory.
+- Uses `rg` to locate `pyproject.toml` files beneath the configured project directory when available.
+- Falls back to `grep` with a warning if `rg` is not installed; consider adding a pre-step to install `rg` for faster runtime.
 - Extracts every `https://...` URL that ends at the first whitespace character.
 - Deduplicates the list of URLs and writes them to a temporary file.
 - Validates each URL with the configured Docker image.
+- Fails immediately if `docker` is not installed or available on `PATH`.
 - Logs `2xx` and `3xx` responses as passing.
 - Fails the action only when a URL returns a `4xx` status code.
 - Other status codes are considered a warning.
