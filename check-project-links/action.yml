@@ -29,12 +29,8 @@ runs:
           exit 1
         fi
 
-        project_directory="$PROJECT_DIRECTORY"
-        allowed_domains="$ALLOWED_DOMAINS"
-        docker_image="$DOCKER_IMAGE"
-
-        if [ ! -d "$project_directory" ]; then
-          echo "::error title=Check Project Links Error::Project directory '$project_directory' does not exist."
+        if [ ! -d "$PROJECT_DIRECTORY" ]; then
+          echo "::error title=Check Project Links Error::Project directory '$PROJECT_DIRECTORY' does not exist."
           exit 1
         fi
 
@@ -53,9 +49,9 @@ runs:
         fi
 
         if [ "$rg_available" -eq 1 ]; then
-          manifest_list_cmd=(rg --files -g 'pyproject.toml' "$project_directory")
+          manifest_list_cmd=(rg --files -g 'pyproject.toml' "$PROJECT_DIRECTORY")
         else
-          manifest_list_cmd=(find "$project_directory" -type f -name 'pyproject.toml')
+          manifest_list_cmd=(find "$PROJECT_DIRECTORY" -type f -name 'pyproject.toml')
         fi
 
         while IFS= read -r manifest; do
@@ -100,7 +96,7 @@ runs:
           fi
 
           allowed=0
-          IFS=',' read -ra domains <<< "$allowed_domains"
+          IFS=',' read -ra domains <<< "$ALLOWED_DOMAINS"
           for domain in "${domains[@]}"; do
             domain="${domain//[[:space:]]/}"
             [ -n "$domain" ] || continue
@@ -169,7 +165,7 @@ runs:
         fi
 
         if [ ! -s "$link_file" ]; then
-          echo "No trusted project links found under $project_directory."
+          echo "No trusted project links found under $PROJECT_DIRECTORY."
           exit 0
         fi
 
@@ -178,7 +174,7 @@ runs:
 
         docker run --rm \
           -v "$link_file:/tmp/project_links.txt:ro" \
-          "$docker_image" \
+          "$DOCKER_IMAGE" \
           sh -ec '
             failed=0
             while IFS= read -r url; do
