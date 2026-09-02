@@ -15,17 +15,23 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Get project links
-      id: get_project_links
+    - name: Check project links
+      id: check-project-links
       shell: bash
       env:
         PROJECT_DIRECTORY: ${{ inputs.project-directory }}
         ALLOWED_DOMAINS: ${{ inputs.allowed-domains }}
+        DOCKER_IMAGE: ${{ inputs.docker-image }}
       run: |
-        set -u
+        set -euo pipefail
 
         if [ ! -d "$PROJECT_DIRECTORY" ]; then
           echo "::error title=Check Project Links Error::Project directory '$PROJECT_DIRECTORY' does not exist."
+          exit 1
+        fi
+        
+        if ! command -v docker >/dev/null 2>&1; then
+          echo "::error title=Check Project Links Error::docker is not available. Install Docker or add a pre-step that installs it before using this action."
           exit 1
         fi
 
@@ -37,8 +43,6 @@ runs:
 
         python3 "$GITHUB_ACTION_PATH/find_project_links.py" "$PROJECT_DIRECTORY" "$ALLOWED_DOMAINS" "$link_file"
 
-        echo "link-file=$link_file" >> "$GITHUB_OUTPUT"
-
         if [ ! -s "$link_file" ]; then
           echo "No trusted project links found under $PROJECT_DIRECTORY."
           exit 0
@@ -47,34 +51,17 @@ runs:
         echo "Found $(wc -l < "$link_file") unique trusted links:"
         cat "$link_file"
 
-    - name: Check project links
-      shell: bash
-      env:
-        LINK_FILE: ${{ steps.get_project_links.outputs.link-file }}
-        DOCKER_IMAGE: ${{ inputs.docker-image }}
-      run: |
-        set -u
-
-        if ! command -v docker >/dev/null 2>&1; then
-          echo "::error title=Check Project Links Error::docker is not available. Install Docker or add a pre-step that installs it before using this action."
-          exit 1
-        fi
-
-        if [ -z "${LINK_FILE:-}" ] || [ ! -f "$LINK_FILE" ]; then
-          echo "::error title=Check Project Links Error::No project links file was generated."
-          exit 1
-        fi
-
-        if [ ! -s "$LINK_FILE" ]; then
+        if [ ! -s "$link_file" ]; then
           echo "No trusted project links found."
           exit 0
         fi
 
-        echo "Found $(wc -l < "$LINK_FILE") unique trusted links:"
-        cat "$LINK_FILE"
+        echo "Found $(wc -l < "$link_file") unique trusted links:"
+        cat "$link_file"
 
-        docker run --rm \
-          -v "$LINK_FILE:/tmp/project_links.txt:ro" \
+        unprivileged_user=100:100 # this matches the default, but we want to be explicit about it
+        docker run -u "${unprivileged_user}" --rm \
+          -v "$link_file:/tmp/project_links.txt:ro" \
           "$DOCKER_IMAGE" \
           sh -ec '
             failed=0
