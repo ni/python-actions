@@ -44,9 +44,8 @@ steps:
 
 ## Behavior
 
-- Uses `rg` to locate `pyproject.toml` files beneath the configured project directory when available.
-- Falls back to `find` (discovery) and `grep` (extraction) with a warning if `rg` is not installed; consider adding a pre-step to install `rg` for faster runtime.
-- Extracts every `https://...` URL that ends at the first whitespace or double-quote character.
+- Uses Python directory walk and [`tomllib`](https://docs.python.org/3/library/tomllib.html) + string search to identify all links in pyproject.toml files under the provided path.
+- Extracts strings that are parsable URLs, and URLs from comments
 - Drops any URL whose hostname is `localhost`, a local loopback address, or any literal IP address before validation.
 - Deduplicates the list of URLs and writes them to a temporary file.
 - Validates each URL with the configured Docker image.
