@@ -36,7 +36,7 @@ runs:
 
         while IFS= read -r manifest; do
           if [ -n "$manifest" ]; then
-            rg -o 'https://[^[:space:]]+' "$manifest" || true
+            rg -o "https://[^\"[:space:]]+" "$manifest" || true
             rg 'http://' "$manifest" && echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $manifest. Consider using HTTPS instead. Ignoring linke." || true
           fi
         done < <(rg --files -g 'pyproject.toml' "$project_directory") | sort -u > "$link_file"
