@@ -1,0 +1,78 @@
+name: Check project links
+description: Find URLs referenced in pyproject.toml files and fail only when a response is 4xx.
+
+inputs:
+  project-directory:
+    description: Path to the directory containing pyproject.toml files.
+    default: ${{ github.workspace }}
+  docker-image:
+    description: Docker image used to validate each discovered URL.
+    default: curlimages/curl:8.22.0@sha256:58adaa4e8dca9c988bae2aba4ab3434a0bb2da16bbe3f92dec39ec7785166777
+
+runs:
+  using: composite
+  steps:
+    - name: Check project links
+      shell: bash
+      run: |
+        set -u
+
+        project_directory="${{ inputs.project-directory }}"
+        docker_image="${{ inputs.docker-image }}"
+
+        if [ ! -d "$project_directory" ]; then
+          echo "::error title=Check Project Links Error::Project directory '$project_directory' does not exist."
+          exit 1
+        fi
+
+        link_file="$(mktemp)"
+        cleanup() {
+          rm -f "$link_file"
+        }
+        trap cleanup EXIT
+
+        while IFS= read -r manifest; do
+          if [ -n "$manifest" ]; then
+            rg -o 'https://[^[:space:]]+' "$manifest" || true
+            rg 'http://[^[:space:]]+' "$manifest" && echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $manifest. Consider using HTTPS instead. Ignoring linke." || true
+          fi
+        done < <(rg --files -g 'pyproject.toml' "$project_directory") | sort -u > "$link_file"
+
+        if [ ! -s "$link_file" ]; then
+          echo "No project links found under $project_directory."
+          exit 0
+        fi
+
+        echo "Found $(wc -l < "$link_file") unique links:"
+        cat "$link_file"
+
+        docker run --rm \
+          -v "$link_file:/tmp/project_links.txt:ro" \
+          "$docker_image" \
+          sh -ec '
+            failed=0
+            while IFS= read -r url; do
+              [ -n "$url" ] || continue
+              status=$(curl -L -sS -o /tmp/link_body -w "%{http_code}" "$url" || true)
+              case "$status" in
+                2??|3??)
+                  echo "PASS $url -> $status"
+                  ;;
+                4??)
+                  echo "FAIL $url -> $status"
+                  failed=1
+                  ;;
+                *)
+                  echo "WARN $url -> $status"
+                  ;;
+              esac
+            done < /tmp/project_links.txt
+            exit "$failed"
+          '
+
+        status=$?
+        if [ "$status" -ne 0 ]; then
+          exit 1
+        fi
+
+        echo "Success: No checked project links returned 4xx responses."
