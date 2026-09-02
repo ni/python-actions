@@ -15,154 +15,29 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Check project links
+    - name: Get project links
+      id: get_project_links
       shell: bash
       env:
         PROJECT_DIRECTORY: ${{ inputs.project-directory }}
         ALLOWED_DOMAINS: ${{ inputs.allowed-domains }}
-        DOCKER_IMAGE: ${{ inputs.docker-image }}
       run: |
         set -u
-
-        if ! command -v docker >/dev/null 2>&1; then
-          echo "::error title=Check Project Links Error::docker is not available. Install Docker or add a pre-step that installs it before using this action."
-          exit 1
-        fi
 
         if [ ! -d "$PROJECT_DIRECTORY" ]; then
           echo "::error title=Check Project Links Error::Project directory '$PROJECT_DIRECTORY' does not exist."
           exit 1
         fi
 
-        manifest_links="$(mktemp)"
         link_file="$(mktemp)"
         cleanup() {
-          rm -f "$manifest_links" "$link_file" "${link_file}.https" "${link_file}.filtered"
+          rm -f "$link_file"
         }
         trap cleanup EXIT
 
-        if command -v rg >/dev/null 2>&1; then
-          rg_available=1
-        else
-          rg_available=0
-          echo "::warning title=Check Project Links Warning::rg is not available; falling back to grep. Consider adding a pre-step to install rg for faster runtime."
-        fi
+        python3 "$GITHUB_ACTION_PATH/find_project_links.py" "$PROJECT_DIRECTORY" "$ALLOWED_DOMAINS" "$link_file"
 
-        if [ "$rg_available" -eq 1 ]; then
-          manifest_list_cmd=(rg --files -g 'pyproject.toml' "$PROJECT_DIRECTORY")
-        else
-          manifest_list_cmd=(find "$PROJECT_DIRECTORY" -type f -name 'pyproject.toml')
-        fi
-
-        while IFS= read -r manifest; do
-          if [ -n "$manifest" ]; then
-            if [ "$rg_available" -eq 1 ]; then
-              rg -o "https\?://[^\"[:space:]]+" "$manifest" || true
-              if rg 'http://' "$manifest" >/dev/null 2>&1; then
-                echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $manifest. Consider using HTTPS instead. Ignoring link."
-              fi
-            else
-              grep -Eo 'https?://[^[:space:]\"]+' "$manifest" || true
-              if grep -Eq 'http://' "$manifest"; then
-                echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $manifest. Consider using HTTPS instead. Ignoring link."
-              fi
-            fi
-          fi
-        done < <("${manifest_list_cmd[@]}") | sort -u > "$manifest_links"
-
-        : > "$link_file"
-        while IFS= read -r url; do
-          [ -n "$url" ] || continue
-
-          if printf '%s\n' "$url" | grep -q 'http://'; then
-            echo "::warning title=Check Project Links Warning::Found insecure HTTP link in $url. Ignoring link."
-            continue
-          fi
-
-          host="${url#*://}"
-          host="${host%%/*}"
-          host="${host%%:*}"
-          host="${host,,}"
-          host="${host%.}"
-
-          if printf '%s\n' "$host" | grep -Eq '^(localhost|.*\.localhost)$'; then
-            continue
-          fi
-          if printf '%s\n' "$host" | grep -Eq '^(127\.|0\.0\.0\.0|::1|169\.254\.|metadata(\.google\.internal)?)$'; then
-            continue
-          fi
-          if printf '%s\n' "$host" | grep -Eq '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|169\.254\.|fc[0-9a-fA-F:]+|fe[89ab][0-9a-fA-F:]+)$'; then
-            continue
-          fi
-
-          allowed=0
-          IFS=',' read -ra domains <<< "$ALLOWED_DOMAINS"
-          for domain in "${domains[@]}"; do
-            domain="${domain//[[:space:]]/}"
-            [ -n "$domain" ] || continue
-            domain="${domain,,}"
-            domain="${domain%.}"
-
-            if [ "${domain:0:2}" = '*.' ]; then
-              suffix="${domain#*.}"
-              case "$host" in
-                "$suffix"|*."$suffix") allowed=1; break ;;
-              esac
-            else
-              case "$host" in
-                "$domain"|*."$domain") allowed=1; break ;;
-              esac
-            fi
-          done
-
-          if [ "$allowed" -eq 1 ]; then
-            printf '%s\n' "$url" >> "$link_file"
-          fi
-        done < "$manifest_links"
-
-        # Explicitly drop insecure HTTP links before validation.
-        grep -v 'http://' "$link_file" > "${link_file}.https" || true
-        if [ -s "${link_file}.https" ]; then
-          mv "${link_file}.https" "$link_file"
-        else
-          : > "$link_file"
-        fi
-
-        # Explicitly drop localhost and any IP-based hostname before validation.
-        : > "${link_file}.filtered"
-        while IFS= read -r url; do
-          [ -n "$url" ] || continue
-
-          host="${url#*://}"
-          host="${host%%/*}"
-          host="${host%%:*}"
-          host="${host,,}"
-          host="${host%.}"
-
-          if printf '%s\n' "$host" | grep -Eq '^(localhost|.*\.localhost)$'; then
-            continue
-          fi
-          if printf '%s\n' "$host" | grep -Eq '^[0-9]+(\.[0-9]+){3}$'; then
-            continue
-          fi
-          if printf '%s\n' "$host" | grep -Eq '^(::1|[0-9a-fA-F:]+)$'; then
-            continue
-          fi
-          if printf '%s\n' "$host" | grep -Eq '^(127\.|0\.0\.0\.0|169\.254\.|metadata(\.google\.internal)?)$'; then
-            continue
-          fi
-          if printf '%s\n' "$host" | grep -Eq '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|fc[0-9a-fA-F:]+|fe[89ab][0-9a-fA-F:]+)$'; then
-            continue
-          fi
-
-          printf '%s\n' "$url" >> "${link_file}.filtered"
-        done < "$link_file"
-
-        if [ -s "${link_file}.filtered" ]; then
-          mv "${link_file}.filtered" "$link_file"
-        else
-          : > "$link_file"
-        fi
+        echo "link-file=$link_file" >> "$GITHUB_OUTPUT"
 
         if [ ! -s "$link_file" ]; then
           echo "No trusted project links found under $PROJECT_DIRECTORY."
@@ -172,8 +47,34 @@ runs:
         echo "Found $(wc -l < "$link_file") unique trusted links:"
         cat "$link_file"
 
+    - name: Check project links
+      shell: bash
+      env:
+        LINK_FILE: ${{ steps.get_project_links.outputs.link-file }}
+        DOCKER_IMAGE: ${{ inputs.docker-image }}
+      run: |
+        set -u
+
+        if ! command -v docker >/dev/null 2>&1; then
+          echo "::error title=Check Project Links Error::docker is not available. Install Docker or add a pre-step that installs it before using this action."
+          exit 1
+        fi
+
+        if [ -z "${LINK_FILE:-}" ] || [ ! -f "$LINK_FILE" ]; then
+          echo "::error title=Check Project Links Error::No project links file was generated."
+          exit 1
+        fi
+
+        if [ ! -s "$LINK_FILE" ]; then
+          echo "No trusted project links found."
+          exit 0
+        fi
+
+        echo "Found $(wc -l < "$LINK_FILE") unique trusted links:"
+        cat "$LINK_FILE"
+
         docker run --rm \
-          -v "$link_file:/tmp/project_links.txt:ro" \
+          -v "$LINK_FILE:/tmp/project_links.txt:ro" \
           "$DOCKER_IMAGE" \
           sh -ec '
             failed=0
