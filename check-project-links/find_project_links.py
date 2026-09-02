@@ -21,8 +21,7 @@ def _parse_args() -> argparse.Namespace:
 
 
 def _is_allowed(hostname: str, allowed: set[str]) -> bool:
-    """
-    Check if the given hostname is allowed based on the provided set of allowed domains.
+    """Check if the given hostname is allowed based on the provided set of allowed domains.
 
     >>> _is_allowed('example.com', {'example.com'})
     True
