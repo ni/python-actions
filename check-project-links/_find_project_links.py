@@ -8,7 +8,7 @@ import typing
 from urllib.parse import urlsplit
 
 try:
-    import tomllib
+    import tomllib  # type: ignore[import-not-found]
 except ModuleNotFoundError:  # pragma: no cover
     raise Exception("tomllib is not available. Please use Python 3.11 or later.")
 
