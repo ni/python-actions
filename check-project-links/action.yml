@@ -41,7 +41,7 @@ runs:
         }
         trap cleanup EXIT
 
-        chmod 644 "$link_file"
+        chmod 644 "$link_file" # make the file world-readable so that the unprivileged user in the docker container can read it
 
         python3 "$GITHUB_ACTION_PATH/_find_project_links.py" "$PROJECT_DIRECTORY" "$ALLOWED_DOMAINS" "$link_file"
 
