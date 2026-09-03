@@ -36,7 +36,7 @@ steps:
   - uses: actions/checkout@v0
 
   - name: Check project links
-    uses: ni/python-actions/check-project-links@v1
+    uses: ni/python-actions/check-project-links@v0
     with:
       project-directory: .
       docker-image: curlimages/curl:8.22.0
@@ -44,8 +44,8 @@ steps:
 
 ## Behavior
 
-- Uses Python directory walk and [`tomllib`](https://docs.python.org/3/library/tomllib.html) + string search to identify all links in pyproject.toml files under the provided path.
-- Extracts strings that are parsable URLs, and URLs from comments
+- Uses Python directory walk + regex search to identify `https://` links in `pyproject.toml` files under the provided path.
+- Extracts `https://` substrings (including from comments) and filters them by the configured allowed domains before validation.
 - Drops any URL whose hostname is `localhost`, a local loopback address, or any literal IP address before validation.
 - Deduplicates the list of URLs and writes them to a temporary file.
 - Validates each URL with the configured Docker image.
