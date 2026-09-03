@@ -35,7 +35,7 @@ runs:
           exit 1
         fi
 
-        link_file="$(mktemp)"
+        link_file="$(mktemp -p \"$RUNNER_TEMP\")"
         cleanup() {
           rm -f "$link_file"
         }
