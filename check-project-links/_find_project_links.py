@@ -4,6 +4,7 @@ import argparse
 import ipaddress
 import os
 import sys
+import typing
 from urllib.parse import urlsplit
 
 try:
@@ -76,7 +77,9 @@ def _safe_under(base_dir: str, candidate_path: str) -> str:
     return safe_candidate
 
 
-def _walk_metadata(value, results: set[str], allowed: set[str]) -> None:
+def _walk_metadata(
+    value: typing.Union[dict, list, str], results: set[str], allowed: set[str]
+) -> None:
     if isinstance(value, dict):
         for item in value.values():
             _walk_metadata(item, results, allowed)
