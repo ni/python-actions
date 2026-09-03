@@ -114,7 +114,11 @@ def _main() -> int:
     safe_project_directory = os.path.realpath(project_directory, strict=True)
     safe_project_directory = _safe_under(os.getcwd(), safe_project_directory)
     allowed_domains = args.allowed_domains
-    safe_output_path = _safe_under("/tmp", os.path.realpath(args.output_path, strict=True))
+
+    runner_temp = os.environ.get("RUNNER_TEMP")
+    if not runner_temp:
+        raise RuntimeError("RUNNER_TEMP is required for output files.")
+    safe_output_path = _safe_under(runner_temp, os.path.realpath(args.output_path, strict=True))
 
     allowed: set[str] = set()
     for raw_domain in allowed_domains.split(","):
