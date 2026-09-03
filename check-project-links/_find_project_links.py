@@ -3,14 +3,9 @@
 import argparse
 import ipaddress
 import os
+import re
 import sys
-import typing
 from urllib.parse import urlsplit
-
-try:
-    import tomllib  # type: ignore[import-not-found]
-except ModuleNotFoundError:  # pragma: no cover
-    raise Exception("tomllib is not available. Please use Python 3.11 or later.")
 
 
 def _parse_args() -> argparse.Namespace:
@@ -77,34 +72,28 @@ def _safe_under(base_dir: str, candidate_path: str) -> str:
     return safe_candidate
 
 
-def _walk_metadata(value: typing.Any, results: set[str], allowed: set[str]) -> None:
-    if isinstance(value, dict):
-        for item in value.values():
-            _walk_metadata(item, results, allowed)
-    elif isinstance(value, list):
-        for item in value:
-            _walk_metadata(item, results, allowed)
-    elif isinstance(value, str):
-        if not value.startswith("https://"):
-            return
-        host = urlsplit(value).hostname
-        if host and _is_allowed(host, allowed):
-            results.add(value)
+_URL_RE = re.compile(r'(https://.+?)(?:"|\s)')
 
 
-def _find_commented_links(manifest_path: str, results: set[str], allowed: set[str]) -> None:
-    """Find URLs embedded in comments within a pyproject.toml file."""
+def _extract_links_from_line(line: str) -> list[str]:
+    """Extract URLs from a single line, stopping before a quote or whitespace."""
+    matches: list[str] = []
+    for match in re.finditer(_URL_RE, line):
+        url = match.group(1)
+        if url:
+            matches.append(url)
+    return matches
+
+
+def _find_project_links(manifest_path: str, results: set[str], allowed: set[str]) -> None:
+    """Find URLs within a pyproject.toml file without parsing TOML."""
     try:
         with open(manifest_path, "r", encoding="utf-8") as manifest_file:
             for line in manifest_file:
-                line = line.strip()
-                prefix, comment = line.split("#", maxsplit=1) if "#" in line else (line, "")
-                if comment.strip():
-                    comment = comment.strip()
-                    if comment.startswith("https://"):
-                        host = urlsplit(comment).hostname  # handles extra at the end just fine
-                        if host and _is_allowed(host, allowed):
-                            results.add(comment)
+                for url in _extract_links_from_line(line):
+                    host = urlsplit(url).hostname
+                    if host and _is_allowed(host, allowed):
+                        results.add(url)
     except OSError:
         print(f"Warning: Failed to read pyproject.toml at {manifest_path}", file=sys.stderr)
 
@@ -131,18 +120,7 @@ def _main() -> int:
                 continue
 
             manifest_path = _safe_under(safe_project_directory, os.path.join(root, file_name))
-            try:
-                with open(manifest_path, "rb") as manifest_file:
-                    metadata = tomllib.load(manifest_file)
-            except (OSError, tomllib.TOMLDecodeError):
-                print(
-                    f"Warning: Failed to read or parse pyproject.toml at {manifest_path}",
-                    file=sys.stderr,
-                )
-                continue
-
-            _walk_metadata(metadata, results, allowed)
-            _find_commented_links(manifest_path, results, allowed)
+            _find_project_links(manifest_path, results, allowed)
 
     output_directory = os.path.dirname(safe_output_path)
     if output_directory:
