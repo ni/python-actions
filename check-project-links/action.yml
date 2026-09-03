@@ -41,6 +41,8 @@ runs:
         }
         trap cleanup EXIT
 
+        chmod 644 "$link_file"
+
         python3 "$GITHUB_ACTION_PATH/_find_project_links.py" "$PROJECT_DIRECTORY" "$ALLOWED_DOMAINS" "$link_file"
 
         if [ ! -s "$link_file" ]; then
