@@ -53,14 +53,6 @@ runs:
         echo "Found $(wc -l < "$link_file") unique trusted links:"
         cat "$link_file"
 
-        if [ ! -s "$link_file" ]; then
-          echo "No trusted project links found."
-          exit 0
-        fi
-
-        echo "Found $(wc -l < "$link_file") unique trusted links:"
-        cat "$link_file"
-
         unprivileged_user=100:100 # this matches the default, but we want to be explicit about it
         docker run -u "${unprivileged_user}" --rm \
           -v "$link_file:/tmp/project_links.txt:ro" \
