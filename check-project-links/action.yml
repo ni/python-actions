@@ -78,9 +78,6 @@ runs:
             exit "$failed"
           '
 
-        status=$?
-        if [ "$status" -ne 0 ]; then
-          exit 1
-        fi
+        # `docker run` failures already cause this step to fail due to `set -e`.
 
         echo "Success: No checked project links returned 4xx responses."
