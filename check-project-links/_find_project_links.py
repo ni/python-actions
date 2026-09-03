@@ -100,11 +100,9 @@ def _find_project_links(manifest_path: str, results: set[str], allowed: set[str]
 
 def _main() -> int:
     args = _parse_args()
-    project_directory = args.project_directory
-    safe_project_directory = os.path.realpath(project_directory, strict=True)
-    safe_project_directory = _safe_under(os.getcwd(), safe_project_directory)
+    safe_project_directory = _safe_under(os.getcwd(), args.project_directory)
     allowed_domains = args.allowed_domains
-    safe_output_path = os.path.realpath(args.output_path, strict=True)
+    output_path = args.output_path
 
     allowed: set[str] = set()
     for raw_domain in allowed_domains.split(","):
@@ -122,11 +120,11 @@ def _main() -> int:
             manifest_path = _safe_under(safe_project_directory, os.path.join(root, file_name))
             _find_project_links(manifest_path, results, allowed)
 
-    output_directory = os.path.dirname(safe_output_path)
+    output_directory = os.path.dirname(output_path)
     if output_directory:
         os.makedirs(output_directory, exist_ok=True)
 
-    with open(safe_output_path, "w", encoding="utf-8") as output_file:
+    with open(output_path, "w", encoding="utf-8") as output_file:
         for url in sorted(results):
             output_file.write(f"{url}\n")
 
