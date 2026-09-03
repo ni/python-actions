@@ -91,6 +91,23 @@ def _walk_metadata(value, results: set[str], allowed: set[str]) -> None:
             results.add(value)
 
 
+def _find_commented_links(manifest_path: str, results: set[str], allowed: set[str]) -> None:
+    """Find URLs embedded in comments within a pyproject.toml file."""
+    try:
+        with open(manifest_path, "r", encoding="utf-8") as manifest_file:
+            for line in manifest_file:
+                line = line.strip()
+                prefix, comment = line.split("#", maxsplit=1) if "#" in line else (line, "")
+                if comment.strip():
+                    comment = comment.strip()
+                    if comment.startswith("https://"):
+                        host = urlsplit(comment).hostname  # handles extra at the end just fine
+                        if host and _is_allowed(host, allowed):
+                            results.add(comment)
+    except OSError:
+        print(f"Warning: Failed to read pyproject.toml at {manifest_path}", file=sys.stderr)
+
+
 def _main() -> int:
     args = _parse_args()
     project_directory = args.project_directory
@@ -124,23 +141,7 @@ def _main() -> int:
                 continue
 
             _walk_metadata(metadata, results, allowed)
-            # Also find any commented URLs in the pyproject.toml file
-            try:
-                with open(manifest_path, "r", encoding="utf-8") as manifest_file:
-                    for line in manifest_file:
-                        line = line.strip()
-                        prefix, comment = line.split("#", maxsplit=1) if "#" in line else (line, "")
-                        if comment.strip():
-                            comment = comment.strip()
-                            if comment.startswith("https://"):
-                                host = urlsplit(
-                                    comment
-                                ).hostname  # handles extra at the end just fine
-                                if host and _is_allowed(host, allowed):
-                                    results.add(comment)
-            except OSError:
-                print(f"Warning: Failed to read pyproject.toml at {manifest_path}", file=sys.stderr)
-                continue
+            _find_commented_links(manifest_path, results, allowed)
 
     output_directory = os.path.dirname(safe_output_path)
     if output_directory:
