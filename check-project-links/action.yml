@@ -1,0 +1,83 @@
+name: Check project links
+description: Find URLs referenced in pyproject.toml files and fail only when a response is 4xx.
+
+inputs:
+  project-directory:
+    description: Path to the directory containing pyproject.toml files.
+    default: ${{ github.workspace }}
+  allowed-domains:
+    description: Comma-separated list of trusted hostnames or domains to validate. Supports wildcards like *.readthedocs.io.
+    default: github.com,ni.github.io,*.readthedocs.io
+  docker-image:
+    description: Docker image used to validate each discovered URL.
+    default: curlimages/curl:8.22.0@sha256:58adaa4e8dca9c988bae2aba4ab3434a0bb2da16bbe3f92dec39ec7785166777
+
+runs:
+  using: composite
+  steps:
+    - name: Check project links
+      id: check-project-links
+      shell: bash
+      env:
+        PROJECT_DIRECTORY: ${{ inputs.project-directory }}
+        ALLOWED_DOMAINS: ${{ inputs.allowed-domains }}
+        DOCKER_IMAGE: ${{ inputs.docker-image }}
+      run: |
+        set -euo pipefail
+
+        if [ ! -d "$PROJECT_DIRECTORY" ]; then
+          echo "::error title=Check Project Links Error::Project directory '$PROJECT_DIRECTORY' does not exist."
+          exit 1
+        fi
+        
+        if ! command -v docker >/dev/null 2>&1; then
+          echo "::error title=Check Project Links Error::docker is not available. Install Docker or add a pre-step that installs it before using this action."
+          exit 1
+        fi
+
+        link_file="$(mktemp -p "$RUNNER_TEMP")"
+        cleanup() {
+          rm -f "$link_file"
+        }
+        trap cleanup EXIT
+
+        chmod 644 "$link_file" # make the file world-readable so that the unprivileged user in the docker container can read it
+
+        python3 "$GITHUB_ACTION_PATH/_find_project_links.py" "$PROJECT_DIRECTORY" "$ALLOWED_DOMAINS" "$link_file"
+
+        if [ ! -s "$link_file" ]; then
+          echo "No trusted project links found under $PROJECT_DIRECTORY."
+          exit 0
+        fi
+
+        echo "Found $(wc -l < "$link_file") unique trusted links:"
+        cat "$link_file"
+
+        unprivileged_user=100:100 # this matches the default, but we want to be explicit about it
+        docker run -u "${unprivileged_user}" --rm \
+          -v "$link_file:/tmp/project_links.txt:ro" \
+          "$DOCKER_IMAGE" \
+          sh -ec '
+            failed=0
+            while IFS= read -r url; do
+              [ -n "$url" ] || continue
+              status=$(curl -L -sS --connect-timeout 5 --max-time 20 -o /tmp/link_body -w "%{http_code}" "$url" || true)
+              case "$status" in
+                2??|3??)
+                  echo "PASS $url -> $status"
+                  ;;
+                4??)
+                  echo "FAIL $url -> $status"
+                  failed=1
+                  ;;
+                *)
+                  echo "WARN $url -> $status"
+                  ;;
+              esac
+            done < /tmp/project_links.txt
+            exit "$failed"
+          '
+
+        # `docker run` failures already cause this step to fail due to `set -e`.
+
+        echo "Success: No checked project links returned 4xx responses."
