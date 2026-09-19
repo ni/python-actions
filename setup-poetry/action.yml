@@ -2,7 +2,7 @@ name: Set up Poetry
 description: Install Poetry, add it to the PATH, and cache it to speed up workflows.
 inputs:
   poetry-version:
-    default: 2.1.4
+    default: 2.4.1
   use-cache:
     description: >
       A Boolean specifying whether to use the cache. Set this to false to work
