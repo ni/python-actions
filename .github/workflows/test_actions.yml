@@ -377,39 +377,33 @@ jobs:
           install-args: "--extras 'colors serialization' --with dev,docs,utils"
       - name: Check for expected dependencies
         run: |
-          echo "Checking for expected packages from extras and dependency groups..."
-          poetry run python -m ensurepip --upgrade
-          pip_list=$(poetry run pip list)
-          echo "Installed packages:"
-          echo "$pip_list"
+          import importlib.metadata
+          import sys
+
+          print("Checking for expected packages from extras and dependency groups...")
+          print("Installed packages:")
+          installed_packages = {}
+          for dist in sorted(importlib.metadata.Distribution.discover(), key=lambda d: d.name):
+            print(f"{dist.name}: {dist.version}")
+            installed_packages[dist.name] = dist
 
           # Check for extras packages
-          if ! echo "$pip_list" | grep -i "colorama"; then
-            echo "::error title=Test Failure::colorama (from colors extra) not found in pip list"
-            exit 1
-          fi
-          if ! echo "$pip_list" | grep -i "tomli"; then
-            echo "::error title=Test Failure::tomli (from serialization extra) not found in pip list"
-            exit 1
-          fi
+          if "colorama" not in installed_packages:
+            sys.exit("::error title=Test Failure::colorama (from colors extra) not installed")
+          if "tomli" not in installed_packages:
+            sys.exit("::error title=Test Failure::tomli (from serialization extra) not installed")
 
           # Check for dependency group packages
-          if ! echo "$pip_list" | grep -i "pytest"; then
-            echo "::error title=Test Failure::pytest (from dev group) not found in pip list"
-            exit 1
-          fi
-          if ! echo "$pip_list" | grep -i "markdown"; then
-            echo "::error title=Test Failure::markdown (from docs group) not found in pip list"
-            exit 1
-          fi
-          if ! echo "$pip_list" | grep -i "click"; then
-            echo "::error title=Test Failure::click (from utils group) not found in pip list"
-            exit 1
-          fi
+          if "pytest" not in installed_packages:
+            sys.exit("::error title=Test Failure::pytest (from dev group) not installed")
+          if "markdown" not in installed_packages:
+            sys.exit("::error title=Test Failure::markdown (from docs group) not installed")
+          if "click" not in installed_packages:
+            sys.exit("::error title=Test Failure::click (from utils group) not installed")
 
-          echo "All expected packages found!"
+          print("All expected packages found!")
         working-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
-        shell: bash
+        shell: poetry run python {0}
 
 
   test_analyze_project_cache_hit:
