@@ -27,7 +27,7 @@ You can specify the `python-version` input for testing with multiple versions of
 ```yaml
 strategy:
   matrix:
-    python-version: [3.9, '3.10', 3.11, 3.12, 3.13]
+    python-version: ['3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, 3.15, 3.15t]
 steps:
 - uses: ni/python-actions/setup-python@v0
   with:
