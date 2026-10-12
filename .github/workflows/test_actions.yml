@@ -13,8 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        # pypy3.11-7.3.20 is a workaround for https://github.com/pypy/pypy/issues/5388 - Regression in 7.3.21: OpenSSL prints verbosely
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.13t, 3.14, 3.14t, pypy3.11-7.3.20]
+        python-version: ['3.10', 3.11, 3.12, 3.13, 3.13t, 3.14, 3.14t, 3.15, 3.15t, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -77,7 +76,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
+        python-version: ['3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, 3.15, 3.15t, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -106,7 +105,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
+        python-version: [3.13]
     steps:
       - name: Check out repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -140,7 +139,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
+        python-version: [3.13]
     steps:
       - name: Check out repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -318,7 +317,7 @@ jobs:
       fail-fast: false # If there are failures, sometimes it is instructive to see which combinations passed
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
+        python-version: ['3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, 3.15, 3.15t, pypy3.11]
     steps:
       - name: Check out repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -378,38 +377,38 @@ jobs:
           install-args: "--extras 'colors serialization' --with dev,docs,utils"
       - name: Check for expected dependencies
         run: |
-          echo "Checking for expected packages from extras and dependency groups..."
-          pip_list=$(poetry run pip list)
-          echo "Installed packages:"
-          echo "$pip_list"
+          import importlib.metadata
+          import sys
+
+          print("Checking for expected packages from extras and dependency groups...")
+          print("Installed packages:")
+          installed_packages = {}
+          for dist in sorted(importlib.metadata.Distribution.discover(), key=lambda d: d.name):
+            print(f"{dist.name}: {dist.version}")
+            installed_packages[dist.name] = dist
 
           # Check for extras packages
-          if ! echo "$pip_list" | grep -i "colorama"; then
-            echo "::error title=Test Failure::colorama (from colors extra) not found in pip list"
-            exit 1
-          fi
-          if ! echo "$pip_list" | grep -i "tomli"; then
-            echo "::error title=Test Failure::tomli (from serialization extra) not found in pip list"
-            exit 1
-          fi
+          if "colorama" not in installed_packages:
+            print("::error title=Test Failure::colorama (from colors extra) not installed")
+            sys.exit(1)
+          if "tomli" not in installed_packages:
+            print("::error title=Test Failure::tomli (from serialization extra) not installed")
+            sys.exit(1)
 
           # Check for dependency group packages
-          if ! echo "$pip_list" | grep -i "pytest"; then
-            echo "::error title=Test Failure::pytest (from dev group) not found in pip list"
-            exit 1
-          fi
-          if ! echo "$pip_list" | grep -i "markdown"; then
-            echo "::error title=Test Failure::markdown (from docs group) not found in pip list"
-            exit 1
-          fi
-          if ! echo "$pip_list" | grep -i "click"; then
-            echo "::error title=Test Failure::click (from utils group) not found in pip list"
-            exit 1
-          fi
+          if "pytest" not in installed_packages:
+            print("::error title=Test Failure::pytest (from dev group) not installed")
+            sys.exit(1)
+          if "Markdown" not in installed_packages:
+            print("::error title=Test Failure::markdown (from docs group) not installed")
+            sys.exit(1)
+          if "click" not in installed_packages:
+            print("::error title=Test Failure::click (from utils group) not installed")
+            sys.exit(1)
 
-          echo "All expected packages found!"
+          print("All expected packages found!")
         working-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
-        shell: bash
+        shell: poetry run python {0}
 
 
   test_analyze_project_cache_hit:
@@ -419,7 +418,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
+        python-version: [3.13]
     steps:
       - name: Check out repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -479,7 +478,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.9, '3.10', 3.11, 3.12, 3.13, 3.14, 3.14t, pypy3.11-7.3.20]
+        python-version: [3.13]
     steps:
       - name: Check out repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
