@@ -389,17 +389,22 @@ jobs:
 
           # Check for extras packages
           if "colorama" not in installed_packages:
-            sys.exit("::error title=Test Failure::colorama (from colors extra) not installed")
+            print("::error title=Test Failure::colorama (from colors extra) not installed")
+            sys.exit(1)
           if "tomli" not in installed_packages:
-            sys.exit("::error title=Test Failure::tomli (from serialization extra) not installed")
+            print("::error title=Test Failure::tomli (from serialization extra) not installed")
+            sys.exit(1)
 
           # Check for dependency group packages
           if "pytest" not in installed_packages:
-            sys.exit("::error title=Test Failure::pytest (from dev group) not installed")
-          if "markdown" not in installed_packages:
-            sys.exit("::error title=Test Failure::markdown (from docs group) not installed")
+            print("::error title=Test Failure::pytest (from dev group) not installed")
+            sys.exit(1)
+          if "Markdown" not in installed_packages:
+            print("::error title=Test Failure::markdown (from docs group) not installed")
+            sys.exit(1)
           if "click" not in installed_packages:
-            sys.exit("::error title=Test Failure::click (from utils group) not installed")
+            print("::error title=Test Failure::click (from utils group) not installed")
+            sys.exit(1)
 
           print("All expected packages found!")
         working-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
