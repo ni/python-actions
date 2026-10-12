@@ -378,6 +378,7 @@ jobs:
       - name: Check for expected dependencies
         run: |
           echo "Checking for expected packages from extras and dependency groups..."
+          poetry run python -m ensurepip --upgrade
           pip_list=$(poetry run pip list)
           echo "Installed packages:"
           echo "$pip_list"
