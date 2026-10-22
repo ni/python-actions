@@ -2,5 +2,18 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "local>ni/python-renovate-config:recommended"
+    ],
+    "customManagers": [
+        {
+            // Update "default: <currentVersion>" in the same way as customManagers:githubActionsVersions
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml$/",
+                "/(^|/)action\\.ya?ml$/"
+            ],
+            "matchStrings": [
+                "# renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: (?:lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\s+default\\s*:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s"
+            ]
+        }
     ]
 }

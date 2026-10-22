@@ -2,6 +2,7 @@ name: Set up Python
 description: Install Python with appropriate defaults for NI Python projects.
 inputs:
   python-version:
+    # renovate: datasource=github-releases depName=python packageName=actions/python-versions versioning=npm
     default: 3.11.9
 outputs:
   python-path:
