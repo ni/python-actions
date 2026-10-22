@@ -2,5 +2,33 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "local>ni/python-renovate-config:recommended"
+    ],
+    "customManagers": [
+        {
+            "description": "Update setup-python default Python version.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^setup-python\\/(?:action.yml|README.md)$/"
+            ],
+            "matchStrings": [
+                "default\\s*:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s",
+                "By default, this action installs Python (?<currentValue>.+?)\\.\\s"
+            ],
+            "matchStringsStrategy": "any",
+            "datasourceTemplate": "python-version",
+            "depNameTemplate": "python",
+            "versioningTemplate": "python"
+        }
+    ],
+    "packageRules": [
+        {
+            "description": "Update setup-python default Python version to latest 3.13.x.",
+            "matchDepNames": [
+                "python"
+            ],
+            "allowedVersions": "< 3.14.0",
+            "rangeStrategy": "replace",
+            "updatePinnedDependencies": true
+        }
     ]
 }
