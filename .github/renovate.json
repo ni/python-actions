@@ -27,8 +27,7 @@
                 "python"
             ],
             "allowedVersions": "< 3.14.0",
-            "rangeStrategy": "replace",
-            "updatePinnedDependencies": true
+            "minimumReleaseAge": "3 days"
         }
     ]
 }
