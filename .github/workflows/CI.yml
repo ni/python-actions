@@ -13,9 +13,9 @@ permissions: {}
 jobs:
   check_actions:
     name: Check actions
-    uses: ./.github/workflows/check_actions.yml
+    uses: $/.github/workflows/check_actions.yml
     permissions:
       security-events: write
   test_actions:
     name: Test actions
-    uses: ./.github/workflows/test_actions.yml
+    uses: $/.github/workflows/test_actions.yml

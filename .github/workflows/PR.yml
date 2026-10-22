@@ -17,6 +17,6 @@ concurrency:
 jobs:
   run_ci:
     name: Run CI
-    uses: ./.github/workflows/CI.yml
+    uses: $/.github/workflows/CI.yml
     permissions:
       security-events: write

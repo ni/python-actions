@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
       - name: Set up Python
         id: setup-python
-        uses: ./setup-python
+        uses: $/setup-python
         with:
           python-version: ${{ matrix.python-version }}
       - name: Check Python version
@@ -83,11 +83,11 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: ./setup-python
+        uses: $/setup-python
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
-        uses: ./setup-poetry
+        uses: $/setup-poetry
       - name: Create project
         run: poetry new test-project
       - name: Check that the project was created
@@ -112,12 +112,12 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: ./setup-python
+        uses: $/setup-python
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         id: setup-poetry
-        uses: ./setup-poetry
+        uses: $/setup-poetry
       - name: Error if cache miss
         if: steps.setup-poetry.outputs.cache-hit != 'true'
         run: echo "::error title=Test Failure::Expected cache hit."; exit 1
@@ -146,12 +146,12 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: ./setup-python
+        uses: $/setup-python
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
         id: setup-poetry
-        uses: ./setup-poetry
+        uses: $/setup-poetry
         with:
           use-cache: false
       - name: Error if cache hit
@@ -177,15 +177,15 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: ./setup-python
+        uses: $/setup-python
       - name: Set up Poetry
-        uses: ./setup-poetry
+        uses: $/setup-poetry
       - name: Create project with version 1.0.0
         run: |
           poetry new test-project
           poetry version 1.0.0 -C test-project
       - name: Check version == 1.0.0
-        uses: ./check-project-version
+        uses: $/check-project-version
         with:
           project-directory: test-project
           expected-version: 1.0.0
@@ -194,7 +194,7 @@ jobs:
       - name: Check version == 1.0.1 (expected to fail)
         id: expected-failure
         continue-on-error: true
-        uses: ./check-project-version
+        uses: $/check-project-version
         with:
           project-directory: test-project
           expected-version: 1.0.1
@@ -213,42 +213,42 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: ./setup-python
+        uses: $/setup-python
       - name: Set up Poetry
-        uses: ./setup-poetry
+        uses: $/setup-poetry
       - name: Create project with version 1.0.0
         run: |
           poetry new test-project
           poetry version 1.0.0 -C test-project
       - name: Update version to 1.0.1
-        uses: ./update-project-version
+        uses: $/update-project-version
         with:
           project-directory: test-project
           create-pull-request: false
           version-rule: patch
           use-dev-suffix: false
       - name: Check version == 1.0.1
-        uses: ./check-project-version
+        uses: $/check-project-version
         with:
           project-directory: test-project
           expected-version: 1.0.1
       - name: Update version to 1.0.2.dev0
-        uses: ./update-project-version
+        uses: $/update-project-version
         with:
           project-directory: test-project
           create-pull-request: false
       - name: Check version == 1.0.2.dev0
-        uses: ./check-project-version
+        uses: $/check-project-version
         with:
           project-directory: test-project
           expected-version: 1.0.2.dev0
       - name: Update version to 1.0.2.dev1
-        uses: ./update-project-version
+        uses: $/update-project-version
         with:
           project-directory: test-project
           create-pull-request: false
       - name: Check version == 1.0.2.dev1
-        uses: ./check-project-version
+        uses: $/check-project-version
         with:
           project-directory: test-project
           expected-version: 1.0.2.dev1
@@ -279,7 +279,7 @@ jobs:
           EOF
         shell: bash
       - name: Check valid project links
-        uses: ./check-project-links
+        uses: $/check-project-links
         with:
           project-directory: test-project
       - name: Create project with a missing link
@@ -301,7 +301,7 @@ jobs:
       - name: Check missing project link (expected to fail)
         id: expected-failure
         continue-on-error: true
-        uses: ./check-project-links
+        uses: $/check-project-links
         with:
           project-directory: failing-project
       - name: Error if the previous step didn't fail
@@ -324,17 +324,17 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: ./setup-python
+        uses: $/setup-python
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
-        uses: ./setup-poetry
+        uses: $/setup-poetry
       - name: Analyze minimal valid project
-        uses: ./analyze-project
+        uses: $/analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
       - name: Analyze ni-python-styleguide-errors project
-        uses: ./analyze-project
+        uses: $/analyze-project
         id: analyze-ni-python-styleguide-errors
         continue-on-error: true
         with:
@@ -345,7 +345,7 @@ jobs:
           echo "::error title=Test Failure::The previous step did not fail as expected."
           exit 1          
       - name: Analyze mypy-errors project
-        uses: ./analyze-project
+        uses: $/analyze-project
         id: analyze-mypy-errors
         continue-on-error: true
         with:
@@ -356,7 +356,7 @@ jobs:
           echo "::error title=Test Failure::The previous step did not fail as expected."
           exit 1          
       - name: Analyze pyright-errors project
-        uses: ./analyze-project
+        uses: $/analyze-project
         id: analyze-pyright-errors
         continue-on-error: true
         with:
@@ -367,11 +367,11 @@ jobs:
           echo "::error title=Test Failure::The previous step did not fail as expected."
           exit 1          
       - name: Analyze only-ni-python-styleguide project
-        uses: ./analyze-project
+        uses: $/analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
       - name: Analyze extras-and-dependency-groups project
-        uses: ./analyze-project
+        uses: $/analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
           install-args: "--extras 'colors serialization' --with dev,docs,utils"
@@ -425,17 +425,17 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: ./setup-python
+        uses: $/setup-python
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
-        uses: ./setup-poetry
+        uses: $/setup-poetry
       - name: Analyze minimal valid project
-        uses: ./analyze-project
+        uses: $/analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/minimal
       - name: Analyze ni-python-styleguide-errors project
-        uses: ./analyze-project
+        uses: $/analyze-project
         id: analyze-ni-python-styleguide-errors
         continue-on-error: true
         with:
@@ -446,7 +446,7 @@ jobs:
           echo "::error title=Test Failure::The previous step did not fail as expected."
           exit 1          
       - name: Analyze mypy-errors project
-        uses: ./analyze-project
+        uses: $/analyze-project
         id: analyze-mypy-errors
         continue-on-error: true
         with:
@@ -457,7 +457,7 @@ jobs:
           echo "::error title=Test Failure::The previous step did not fail as expected."
           exit 1          
       - name: Analyze pyright-errors project
-        uses: ./analyze-project
+        uses: $/analyze-project
         id: analyze-pyright-errors
         continue-on-error: true
         with:
@@ -468,7 +468,7 @@ jobs:
           echo "::error title=Test Failure::The previous step did not fail as expected."
           exit 1          
       - name: Analyze only-ni-python-styleguide project
-        uses: ./analyze-project
+        uses: $/analyze-project
         with:
           project-directory: ${{ github.workspace }}/.github/test_projects/only-ni-python-styleguide
 
@@ -485,16 +485,16 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: ./setup-python
+        uses: $/setup-python
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
-        uses: ./setup-poetry
+        uses: $/setup-poetry
       - name: Copy Python project to root
         run: cp -av "${{ github.workspace }}/.github/test_projects/repo_root"/* "${{ github.workspace }}"
         shell: bash
       - name: Analyze Python project
-        uses: ./analyze-project
+        uses: $/analyze-project
 
   # This job is intended to combine the test results so we don't have to list
   # each matrix combination in the required status check settings. There are a
