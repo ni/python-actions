@@ -1,5 +1,5 @@
 [project]
-name = "minimal"
+name = "isolated-build-environment"
 version = "0.1.0"
 description = "Tests actions/analyze-project with a project that uses an isolated build environment"
 authors = [
