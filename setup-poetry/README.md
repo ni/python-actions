@@ -6,7 +6,7 @@ speed up workflows.
 This action installs Poetry using the Python version that was selected by the
 `ni/python-actions/setup-python` action, so you must call `ni/python-actions/setup-python` first.
 
-By default, this action installs Poetry 2.4.1.
+By default, this action installs Poetry 2.4.3.
 
 ## Usage
 
