@@ -11,12 +11,27 @@
                 "/^setup-python\\/(?:action.yml|README.md)$/"
             ],
             "matchStrings": [
-                "default\\s*:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s",
+                "python-version:\\s+default\\s*:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s",
                 "By default, this action installs Python (?<currentValue>.+?)\\.\\s"
             ],
             "matchStringsStrategy": "any",
             "datasourceTemplate": "python-version",
             "depNameTemplate": "python",
+            "versioningTemplate": "python"
+        },
+        {
+            "description": "Update setup-poetry default Poetry version.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^setup-poetry\\/(?:action.yml|README.md)$/"
+            ],
+            "matchStrings": [
+                "poetry-version:\\s+default\\s*:\\s*[\"']?(?<currentValue>.+?)[\"']?\\s",
+                "By default, this action installs Poetry (?<currentValue>.+?)\\.\\s"
+            ],
+            "matchStringsStrategy": "any",
+            "datasourceTemplate": "pypi",
+            "depNameTemplate": "poetry",
             "versioningTemplate": "python"
         }
     ],
@@ -27,6 +42,14 @@
                 "python"
             ],
             "allowedVersions": "< 3.14.0",
+            "minimumReleaseAge": "3 days"
+        },
+        {
+            "description": "Update setup-poetry default Poetry version to latest 2.4.x.",
+            "matchDepNames": [
+                "poetry"
+            ],
+            "allowedVersions": "< 2.5.0",
             "minimumReleaseAge": "3 days"
         }
     ]
