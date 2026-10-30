@@ -16,6 +16,16 @@ runs:
       id: setup-python
       with:
         python-version: ${{ inputs.python-version }}
+    - name: Work around https://github.com/actions/setup-python/issues/1348 - pip is broken after downgrade on Windows pypy-3.11
+      # For PyPy, actions/setup-python runs "python -m pip install
+      # --ignore-installed pip". This installs the new pip files on top of the
+      # old pip files without removing existing files and causes pip to report
+      # that the old version is installed. Downgrading pip when it's in this
+      # state tends to break it. To work around this, force-reinstall the latest
+      # pip.
+      if: ${{ startsWith(inputs.python-version, 'pypy') }}
+      run: python -m pip install --upgrade --force-reinstall pip
+      shell: bash
     - name: Add pythonVersion environment variable
       run: | # zizmor: ignore[github-env] # value is queried from the installed Python interpreter, not user input
         echo "pythonVersion=$PYTHON_VERSION" >> "$GITHUB_ENV"
