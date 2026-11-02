@@ -409,6 +409,10 @@ jobs:
           print("All expected packages found!")
         working-directory: ${{ github.workspace }}/.github/test_projects/extras-and-dependency-groups
         shell: poetry run python {0}
+      - name: Analyze isolated-build-environment project
+        uses: $/analyze-project
+        with:
+          project-directory: ${{ github.workspace }}/.github/test_projects/isolated-build-environment
 
 
   test_analyze_project_cache_hit:
