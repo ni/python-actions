@@ -71,7 +71,7 @@ jobs:
           OUTPUT_PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
 
   test_setup_python_default_python_version:
-    name: Test setup-python with default python-version
+    name: Test setup-python (default python-version)
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
