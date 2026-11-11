@@ -70,6 +70,43 @@ jobs:
           MATRIX_PYTHON_VERSION: ${{ matrix.python-version }}
           OUTPUT_PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
 
+  test_setup_python_default_python_version:
+    name: Test setup-python (default python-version)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        id: setup-python
+        uses: $/setup-python
+      - name: Check Python version
+        run: |
+          import sys, sysconfig, re, os
+
+          expected_python_version = os.environ["EXPECTED_PYTHON_VERSION"]
+          output_python_version = os.environ["OUTPUT_PYTHON_VERSION"]
+
+          match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", expected_python_version)
+          expected_version = tuple(int(g) for g in match.groups() if g is not None)
+          version = sys.version_info[:len(expected_version)]
+          if version != expected_version:
+              print(f"::error title=Test Failure::The Python version does not match. Got {version}, expected {expected_version}.")
+              sys.exit(1)
+          match = re.search(r"(\d+)\.(\d+)(?:\.(\d+))?", output_python_version)
+          output_version = tuple(int(g) for g in match.groups() if g is not None)[:len(expected_version)]
+          if output_version != expected_version:
+              print(f"::error title=Test Failure::The outputs.python-version version does not match. Got {output_version}, expected {expected_version}.")
+              sys.exit(1)
+        shell: python
+        env:
+          EXPECTED_PYTHON_VERSION: 3.13.17
+          OUTPUT_PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
+
   test_setup_poetry:
     name: Test setup-poetry
     runs-on: ${{ matrix.os }}
@@ -509,6 +546,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [
       test_setup_python, 
+      test_setup_python_default_python_version, 
       test_setup_poetry, 
       test_setup_poetry_cache_hit,
       test_setup_poetry_no_cache,
